@@ -85,7 +85,8 @@ impl SeekingAlpha {
 
     /// Get global markets by country
     pub async fn global_markets(&self, country: &str) -> Result<Vec<NewsArticle>> {
-        self.fetch_feed(&format!("global-markets-{}", country)).await
+        self.fetch_feed(&format!("global-markets-{}", country))
+            .await
     }
 
     /// Get sectors by sector name
@@ -112,20 +113,24 @@ impl NewsSource for SeekingAlpha {
     async fn fetch_feed(&self, category: &str) -> Result<Vec<NewsArticle>> {
         let url = format!("{}?category={}", self.base_url, category);
         info!("Fetching Seeking Alpha feed: {}", url);
-        
+
         let response = self.client.get(&url).send().await?;
         let content = response.text().await?;
-        
+
         debug!("Received {} bytes of content", content.len());
-        
+
         let mut articles = self.parser.parse_response(&content)?;
-        
+
         // Set source for all articles
         for article in &mut articles {
             article.source = Some(self.name().to_string());
         }
-        
-        info!("Parsed {} articles from Seeking Alpha {}", articles.len(), category);
+
+        info!(
+            "Parsed {} articles from Seeking Alpha {}",
+            articles.len(),
+            category
+        );
         Ok(articles)
     }
 
@@ -142,7 +147,7 @@ impl NewsSource for SeekingAlpha {
             "most-popular-articles",
             "forex",
             "editors-picks",
-            "etfs"
+            "etfs",
         ]
     }
 }

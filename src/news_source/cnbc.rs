@@ -25,7 +25,7 @@ impl CNBC {
     /// Create a new CNBC client with custom config
     pub fn with_config(client: Client, config: SourceConfig) -> Self {
         let mut topic_categories = HashMap::new();
-        
+
         // RSS feed IDs for CNBC topics
         topic_categories.insert("top_news", 100003114);
         topic_categories.insert("world_news", 100727362);
@@ -65,7 +65,10 @@ impl CNBC {
         if let Some(&topic_id) = self.topic_categories.get(topic) {
             self.fetch_feed(&topic_id.to_string()).await
         } else {
-            Err(crate::error::FanError::InvalidUrl(format!("Invalid topic: {}", topic)))
+            Err(crate::error::FanError::InvalidUrl(format!(
+                "Invalid topic: {}",
+                topic
+            )))
         }
     }
 
@@ -108,20 +111,24 @@ impl NewsSource for CNBC {
     async fn fetch_feed(&self, topic_id: &str) -> Result<Vec<NewsArticle>> {
         let url = self.config.base_url.replace("{topic_id}", topic_id);
         info!("Fetching CNBC feed: {}", url);
-        
+
         let response = self.client.get(&url).send().await?;
         let content = response.text().await?;
-        
+
         debug!("Received {} bytes of content", content.len());
-        
+
         let mut articles = self.parser.parse_response(&content)?;
-        
+
         // Set source for all articles
         for article in &mut articles {
             article.source = Some(self.name().to_string());
         }
-        
-        info!("Parsed {} articles from CNBC topic {}", articles.len(), topic_id);
+
+        info!(
+            "Parsed {} articles from CNBC topic {}",
+            articles.len(),
+            topic_id
+        );
         Ok(articles)
     }
 

@@ -19,7 +19,7 @@ impl MarketWatch {
     /// Create a new MarketWatch client
     pub fn new(client: Client) -> Self {
         let mut topic_categories = HashMap::new();
-        
+
         // RSS feed IDs for MarketWatch topics
         topic_categories.insert("top_stories", "topstories");
         topic_categories.insert("real_time_headlines", "realtimeheadlines");
@@ -48,7 +48,10 @@ impl MarketWatch {
         if let Some(&topic_id) = self.topic_categories.get(topic) {
             self.fetch_feed(topic_id).await
         } else {
-            Err(crate::error::FanError::InvalidUrl(format!("Invalid topic: {}", topic)))
+            Err(crate::error::FanError::InvalidUrl(format!(
+                "Invalid topic: {}",
+                topic
+            )))
         }
     }
 
@@ -131,20 +134,24 @@ impl NewsSource for MarketWatch {
     async fn fetch_feed(&self, topic: &str) -> Result<Vec<NewsArticle>> {
         let url = self.base_url.replace("{topic}", topic);
         info!("Fetching MarketWatch feed: {}", url);
-        
+
         let response = self.client.get(&url).send().await?;
         let content = response.text().await?;
-        
+
         debug!("Received {} bytes of content", content.len());
-        
+
         let mut articles = self.parser.parse_response(&content)?;
-        
+
         // Set source for all articles
         for article in &mut articles {
             article.source = Some(self.name().to_string());
         }
-        
-        info!("Parsed {} articles from MarketWatch topic {}", articles.len(), topic);
+
+        info!(
+            "Parsed {} articles from MarketWatch topic {}",
+            articles.len(),
+            topic
+        );
         Ok(articles)
     }
 

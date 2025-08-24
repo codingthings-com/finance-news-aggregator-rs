@@ -17,7 +17,7 @@ impl WallStreetJournal {
     /// Create a new Wall Street Journal client
     pub fn new(client: Client) -> Self {
         let config = SourceConfig::new("https://feeds.a.dj.com/rss/{topic}.xml");
-        
+
         Self {
             config,
             client,
@@ -78,19 +78,19 @@ impl NewsSource for WallStreetJournal {
     async fn fetch_feed(&self, topic: &str) -> Result<Vec<NewsArticle>> {
         let url = self.config.base_url.replace("{topic}", topic);
         info!("Fetching WSJ feed: {}", url);
-        
+
         let response = self.client.get(&url).send().await?;
         let content = response.text().await?;
-        
+
         debug!("Received {} bytes of content", content.len());
-        
+
         let mut articles = self.parser.parse_response(&content)?;
-        
+
         // Set source for all articles
         for article in &mut articles {
             article.source = Some(self.name().to_string());
         }
-        
+
         info!("Parsed {} articles from WSJ {}", articles.len(), topic);
         Ok(articles)
     }
@@ -98,11 +98,11 @@ impl NewsSource for WallStreetJournal {
     fn available_topics(&self) -> Vec<&'static str> {
         vec![
             "RSSOpinion",
-            "RSSWorldNews", 
+            "RSSWorldNews",
             "WSJcomUSBusiness",
             "RSSMarketsMain",
             "RSSWSJD",
-            "RSSLifestyle"
+            "RSSLifestyle",
         ]
     }
 }
@@ -114,18 +114,17 @@ mod tests {
 
     #[tokio::test]
     async fn test_wsj_opinions() {
-        let config = SourceConfig::new("https://feeds.a.dj.com/rss/{topic}.xml")
-            .with_timeout(30);
-            
+        let config = SourceConfig::new("https://feeds.a.dj.com/rss/{topic}.xml").with_timeout(30);
+
         let client = Client::builder()
             .timeout(config.timeout_duration())
             .user_agent(&config.user_agent)
             .build()
             .expect("Failed to create HTTP client");
-            
+
         let wsj = WallStreetJournal::with_config(client, config);
         let result = wsj.opinions().await;
-        
+
         match result {
             Ok(articles) => {
                 println!("Successfully fetched {} opinion articles", articles.len());
@@ -146,7 +145,7 @@ mod tests {
             .with_timeout(60)
             .with_user_agent("Custom User Agent")
             .with_retries(5, 2000);
-            
+
         assert_eq!(config.base_url, "https://feeds.a.dj.com/rss/{topic}.xml");
         assert_eq!(config.timeout_seconds, 60);
         assert_eq!(config.user_agent, "Custom User Agent");

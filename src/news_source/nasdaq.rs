@@ -1,7 +1,7 @@
 use crate::error::Result;
 use crate::news_source::NewsSource;
 use crate::parser::NewsParser;
-use crate::types::{NewsArticle, SourceConfig};
+use crate::types::NewsArticle;
 use async_trait::async_trait;
 use log::{debug, info};
 use reqwest::Client;
@@ -29,20 +29,23 @@ impl NASDAQ {
     pub async fn original_content(&self) -> Result<Vec<NewsArticle>> {
         let url = &self.original_content_url;
         info!("Fetching NASDAQ original content: {}", url);
-        
+
         let response = self.client.get(url).send().await?;
         let content = response.text().await?;
-        
+
         debug!("Received {} bytes of content", content.len());
-        
+
         let mut articles = self.parser.parse_response(&content)?;
-        
+
         // Set source for all articles
         for article in &mut articles {
             article.source = Some(self.name().to_string());
         }
-        
-        info!("Parsed {} articles from NASDAQ original content", articles.len());
+
+        info!(
+            "Parsed {} articles from NASDAQ original content",
+            articles.len()
+        );
         Ok(articles)
     }
 
@@ -50,20 +53,24 @@ impl NASDAQ {
     pub async fn feed_by_category(&self, category: &str) -> Result<Vec<NewsArticle>> {
         let url = format!("{}?category={}", self.base_url, category);
         info!("Fetching NASDAQ feed: {}", url);
-        
+
         let response = self.client.get(&url).send().await?;
         let content = response.text().await?;
-        
+
         debug!("Received {} bytes of content", content.len());
-        
+
         let mut articles = self.parser.parse_response(&content)?;
-        
+
         // Set source for all articles
         for article in &mut articles {
             article.source = Some(self.name().to_string());
         }
-        
-        info!("Parsed {} articles from NASDAQ category {}", articles.len(), category);
+
+        info!(
+            "Parsed {} articles from NASDAQ category {}",
+            articles.len(),
+            category
+        );
         Ok(articles)
     }
 
@@ -135,14 +142,14 @@ impl NewsSource for NASDAQ {
         vec![
             "original",
             "commodities",
-            "cryptocurrency", 
+            "cryptocurrency",
             "dividends",
             "earnings",
             "economics",
             "financial-advisors",
             "innovation",
             "stocks",
-            "technology"
+            "technology",
         ]
     }
 }

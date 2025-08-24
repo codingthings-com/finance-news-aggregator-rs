@@ -5,15 +5,15 @@ use quick_xml::events::Event;
 use std::collections::HashMap;
 
 /// RSS/XML parser for news feeds with namespace support
-/// 
+///
 /// The parser handles RSS feeds from different news sources, each with their own
 /// XML namespaces and tag structures. It normalizes the content into `NewsArticle` structs.
-/// 
+///
 /// # Examples
-/// 
+///
 /// ```rust
 /// use finance_news_aggregator_rs::parser::NewsParser;
-/// 
+///
 /// let parser = NewsParser::new("wsj");
 /// let rss_content = r#"
 /// <rss>
@@ -27,7 +27,7 @@ use std::collections::HashMap;
 ///   </channel>
 /// </rss>
 /// "#;
-/// 
+///
 /// let articles = parser.parse_response(rss_content).unwrap();
 /// assert_eq!(articles.len(), 1);
 /// assert_eq!(articles[0].title.as_ref().unwrap(), "Market Update");
@@ -39,16 +39,16 @@ pub struct NewsParser {
 
 impl NewsParser {
     /// Create a new parser for the specified news source
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `client_type` - The news source identifier (e.g., "wsj", "cnbc", "nasdaq")
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```rust
     /// use finance_news_aggregator_rs::parser::NewsParser;
-    /// 
+    ///
     /// let wsj_parser = NewsParser::new("wsj");
     /// let cnbc_parser = NewsParser::new("cnbc");
     /// ```
@@ -113,24 +113,24 @@ impl NewsParser {
     }
 
     /// Parse RSS/XML content into NewsArticle structs
-    /// 
+    ///
     /// Processes RSS feed content and extracts article information, handling
     /// namespace-specific tags and converting them to standardized fields.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `content` - Raw RSS/XML content as a string
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A `Result` containing a vector of `NewsArticle` structs on success,
     /// or a `FanError` if parsing fails.
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```rust
     /// use finance_news_aggregator_rs::parser::NewsParser;
-    /// 
+    ///
     /// let parser = NewsParser::new("wsj");
     /// let rss_content = r#"
     /// <rss>
@@ -142,7 +142,7 @@ impl NewsParser {
     ///   </channel>
     /// </rss>
     /// "#;
-    /// 
+    ///
     /// let articles = parser.parse_response(rss_content)?;
     /// # Ok::<(), finance_news_aggregator_rs::error::FanError>(())
     /// ```
@@ -195,7 +195,7 @@ impl NewsParser {
     }
 
     /// Clean tag names by removing namespaces and prefixes
-    /// 
+    ///
     /// Removes source-specific XML namespaces and namespace prefixes to normalize
     /// tag names across different news sources.
     fn clean_tag_name(&self, tag: &str) -> String {
@@ -216,7 +216,7 @@ impl NewsParser {
     }
 
     /// Set the appropriate field in NewsArticle based on tag name
-    /// 
+    ///
     /// Maps XML tag names to NewsArticle fields. Standard RSS tags like "title",
     /// "link", "description" are mapped to their corresponding fields, while
     /// unknown tags are stored in the `extra_fields` HashMap.

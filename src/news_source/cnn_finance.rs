@@ -79,20 +79,23 @@ impl CNNFinance {
     pub async fn morning_buzz(&self) -> Result<Vec<NewsArticle>> {
         let url = &self.buzz_url;
         info!("Fetching CNN Finance morning buzz: {}", url);
-        
+
         let response = self.client.get(url).send().await?;
         let content = response.text().await?;
-        
+
         debug!("Received {} bytes of content", content.len());
-        
+
         let mut articles = self.parser.parse_response(&content)?;
-        
+
         // Set source for all articles
         for article in &mut articles {
             article.source = Some(self.name().to_string());
         }
-        
-        info!("Parsed {} articles from CNN Finance morning buzz", articles.len());
+
+        info!(
+            "Parsed {} articles from CNN Finance morning buzz",
+            articles.len()
+        );
         Ok(articles)
     }
 }
@@ -110,20 +113,24 @@ impl NewsSource for CNNFinance {
     async fn fetch_feed(&self, topic: &str) -> Result<Vec<NewsArticle>> {
         let url = self.base_url.replace("{topic}", topic);
         info!("Fetching CNN Finance feed: {}", url);
-        
+
         let response = self.client.get(&url).send().await?;
         let content = response.text().await?;
-        
+
         debug!("Received {} bytes of content", content.len());
-        
+
         let mut articles = self.parser.parse_response(&content)?;
-        
+
         // Set source for all articles
         for article in &mut articles {
             article.source = Some(self.name().to_string());
         }
-        
-        info!("Parsed {} articles from CNN Finance topic {}", articles.len(), topic);
+
+        info!(
+            "Parsed {} articles from CNN Finance topic {}",
+            articles.len(),
+            topic
+        );
         Ok(articles)
     }
 
@@ -139,7 +146,7 @@ impl NewsSource for CNNFinance {
             "money_pf",
             "money_real_estate",
             "money_technology",
-            "morning_buzz"
+            "morning_buzz",
         ]
     }
 }

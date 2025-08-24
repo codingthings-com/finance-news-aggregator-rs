@@ -23,13 +23,13 @@ pub use yahoo_finance::YahooFinance;
 pub trait NewsSource {
     /// Get the name of the news source
     fn name(&self) -> &'static str;
-    
+
     /// Get the base URL pattern for this source
     fn base_url(&self) -> &str;
-    
+
     /// Make a request to fetch news articles
     async fn fetch_feed(&self, topic: &str) -> Result<Vec<NewsArticle>>;
-    
+
     /// Get available topics/feeds for this source
     fn available_topics(&self) -> Vec<&'static str>;
 }

@@ -294,7 +294,6 @@ mod tests {
         assert!(client.market_watch_client.is_some());
     }
 
-
     #[tokio::test]
     async fn test_seeking_alpha_client_access() {
         let mut client = NewsClient::new();

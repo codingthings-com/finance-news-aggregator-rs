@@ -1,6 +1,6 @@
+use fake_user_agent::get_safari_rua;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use fake_user_agent::get_safari_rua;
 
 /// Represents a news article from any source
 #[derive(Debug, Clone, Serialize, Deserialize)]
