@@ -17,7 +17,7 @@ async fn main() -> Result<()> {
         Ok(articles) => {
             println!("WSJ Opinions: {} articles", articles.len());
             if let Some(first) = articles.first() {
-                println!("  Latest: {}", first.title.as_deref().unwrap_or("No title"));
+                println!("  Latest: {}. Link: {}", first.title.as_deref().unwrap_or("No title"), first.link.as_deref().unwrap_or("No link"));
             }
         }
         Err(e) => eprintln!("WSJ Error: {}", e),
@@ -30,7 +30,7 @@ async fn main() -> Result<()> {
         Ok(articles) => {
             println!("CNBC Top News: {} articles", articles.len());
             if let Some(first) = articles.first() {
-                println!("  Latest: {}", first.title.as_deref().unwrap_or("No title"));
+                println!("  Latest: {}. Link: {}", first.title.as_deref().unwrap_or("No title"), first.link.as_deref().unwrap_or("No link"));
             }
         }
         Err(e) => eprintln!("CNBC Error: {}", e),
@@ -43,7 +43,7 @@ async fn main() -> Result<()> {
         Ok(articles) => {
             println!("NASDAQ Original Content: {} articles", articles.len());
             if let Some(first) = articles.first() {
-                println!("  Latest: {}", first.title.as_deref().unwrap_or("No title"));
+                println!("  Latest: {}. Link: {}", first.title.as_deref().unwrap_or("No title"), first.link.as_deref().unwrap_or("No link"));
             }
         }
         Err(e) => eprintln!("NASDAQ Error: {}", e),
@@ -56,7 +56,7 @@ async fn main() -> Result<()> {
         Ok(articles) => {
             println!("MarketWatch Top Stories: {} articles", articles.len());
             if let Some(first) = articles.first() {
-                println!("  Latest: {}", first.title.as_deref().unwrap_or("No title"));
+                println!("  Latest: {}. Link: {}", first.title.as_deref().unwrap_or("No title"), first.link.as_deref().unwrap_or("No link"));
             }
         }
         Err(e) => eprintln!("MarketWatch Error: {}", e),
@@ -69,7 +69,7 @@ async fn main() -> Result<()> {
         Ok(articles) => {
             println!("Seeking Alpha Latest: {} articles", articles.len());
             if let Some(first) = articles.first() {
-                println!("  Latest: {}", first.title.as_deref().unwrap_or("No title"));
+                println!("  Latest: {}. Link: {}", first.title.as_deref().unwrap_or("No title"), first.link.as_deref().unwrap_or("No link"));
             }
         }
         Err(e) => eprintln!("Seeking Alpha Error: {}", e),
@@ -82,7 +82,7 @@ async fn main() -> Result<()> {
         Ok(articles) => {
             println!("CNN Finance All Stories: {} articles", articles.len());
             if let Some(first) = articles.first() {
-                println!("  Latest: {}", first.title.as_deref().unwrap_or("No title"));
+                println!("  Latest: {}. Link: {}", first.title.as_deref().unwrap_or("No title"), first.link.as_deref().unwrap_or("No link"));
             }
         }
         Err(e) => eprintln!("CNN Finance Error: {}", e),
@@ -95,7 +95,7 @@ async fn main() -> Result<()> {
         Ok(articles) => {
             println!("Yahoo Finance News: {} articles", articles.len());
             if let Some(first) = articles.first() {
-                println!("  Latest: {}", first.title.as_deref().unwrap_or("No title"));
+                println!("  Latest: {}. Link: {}", first.title.as_deref().unwrap_or("No title"), first.link.as_deref().unwrap_or("No link"));
             }
 
             // Save a sample to file
