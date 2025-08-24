@@ -7,10 +7,10 @@ license = "MIT"
 authors = ["codingthings <hello@codingthings.com>"]
 repository = "https://github.com/codingthings-com/finance-news-aggregator-rs"
 keywords = [
-    "financial news rss",
+    "financial-news",
     "wsj",
-    "seeking alpha",
-    "yahoo finance",
+    "seeking-alpha",
+    "yahoo-finance",
     "nasdaq",
 ]
 categories = ["finance"]
