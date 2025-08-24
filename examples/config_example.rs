@@ -1,5 +1,5 @@
-use fan_rs::{NewsClient, Result};
-use fan_rs::types::SourceConfig;
+use finance_news_aggregator_rs::{NewsClient, Result};
+use finance_news_aggregator_rs::types::SourceConfig;
 
 #[tokio::main]
 async fn main() -> Result<()> {

@@ -20,7 +20,6 @@ A Rust port of the Python `finnews` library for aggregating financial news from 
 - **CNBC**: Top News, World News, Business, Technology, Investing, and 20+ other categories
 - **NASDAQ**: Original Content, Commodities, Cryptocurrency, Dividends, Earnings, Economics, etc.
 - **MarketWatch**: Top Stories, Real-time Headlines, Market Pulse, Bulletins, Personal Finance, etc.
-- **S&P Global**: Research, Market Commentary, Index Launches, Methodologies, Performance Reports, etc.
 - **Seeking Alpha**: Latest Articles, Market News, Long/Short Ideas, IPO Analysis, Transcripts, etc.
 - **CNN Finance**: All Stories, Companies, Economy, Markets, Media, Technology, etc.
 - **Yahoo Finance**: General News, Market Summary, Headlines by Symbol, Industry News
@@ -39,8 +38,8 @@ finance-news-aggregator-rs = "0.1.0"
 ### Library Usage
 
 ```rust
-use fan_rs::{NewsClient, Result};
-use fan_rs::types::SourceConfig;
+use finance_news_aggregator_rs::{NewsClient, Result};
+use finance_news_aggregator_rs::types::SourceConfig;
 
 #[tokio::main]
 async fn main() -> Result<()> {

@@ -7,7 +7,6 @@ pub mod cnn_finance;
 pub mod market_watch;
 pub mod nasdaq;
 pub mod seeking_alpha;
-pub mod sp_global;
 pub mod wsj;
 pub mod yahoo_finance;
 
@@ -16,7 +15,6 @@ pub use cnn_finance::CNNFinance;
 pub use market_watch::MarketWatch;
 pub use nasdaq::NASDAQ;
 pub use seeking_alpha::SeekingAlpha;
-pub use sp_global::SPGlobal;
 pub use wsj::WallStreetJournal;
 pub use yahoo_finance::YahooFinance;
 

@@ -1,4 +1,4 @@
-use fan_rs::{NewsClient, Result};
+use finance_news_aggregator_rs::{NewsClient, Result};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -60,19 +60,6 @@ async fn main() -> Result<()> {
             }
         }
         Err(e) => eprintln!("MarketWatch Error: {}", e),
-    }
-    
-    // S&P Global
-    println!("\n=== S&P Global ===");
-    let sp_global = news_client.sp_global();
-    match sp_global.research().await {
-        Ok(articles) => {
-            println!("S&P Global Research: {} articles", articles.len());
-            if let Some(first) = articles.first() {
-                println!("  Latest: {}", first.title.as_deref().unwrap_or("No title"));
-            }
-        }
-        Err(e) => eprintln!("S&P Global Error: {}", e),
     }
     
     // Seeking Alpha

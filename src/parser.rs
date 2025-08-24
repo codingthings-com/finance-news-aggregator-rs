@@ -12,7 +12,7 @@ use std::collections::HashMap;
 /// # Examples
 /// 
 /// ```rust
-/// use fan_rs::parser::NewsParser;
+/// use finance_news_aggregator_rs::parser::NewsParser;
 /// 
 /// let parser = NewsParser::new("wsj");
 /// let rss_content = r#"
@@ -47,7 +47,7 @@ impl NewsParser {
     /// # Examples
     /// 
     /// ```rust
-    /// use fan_rs::parser::NewsParser;
+    /// use finance_news_aggregator_rs::parser::NewsParser;
     /// 
     /// let wsj_parser = NewsParser::new("wsj");
     /// let cnbc_parser = NewsParser::new("cnbc");
@@ -129,7 +129,7 @@ impl NewsParser {
     /// # Examples
     /// 
     /// ```rust
-    /// use fan_rs::parser::NewsParser;
+    /// use finance_news_aggregator_rs::parser::NewsParser;
     /// 
     /// let parser = NewsParser::new("wsj");
     /// let rss_content = r#"
@@ -144,7 +144,7 @@ impl NewsParser {
     /// "#;
     /// 
     /// let articles = parser.parse_response(rss_content)?;
-    /// # Ok::<(), fan_rs::error::FanError>(())
+    /// # Ok::<(), finance_news_aggregator_rs::error::FanError>(())
     /// ```
     pub fn parse_response(&self, content: &str) -> Result<Vec<NewsArticle>> {
         let mut reader = Reader::from_str(content);

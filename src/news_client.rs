@@ -16,7 +16,6 @@ pub struct NewsClient {
     cnbc_client: Option<CNBC>,
     nasdaq_client: Option<NASDAQ>,
     market_watch_client: Option<MarketWatch>,
-    sp_global_client: Option<SPGlobal>,
     seeking_alpha_client: Option<SeekingAlpha>,
     cnn_finance_client: Option<CNNFinance>,
     yahoo_finance_client: Option<YahooFinance>,
@@ -45,7 +44,6 @@ impl NewsClient {
             cnbc_client: None,
             nasdaq_client: None,
             market_watch_client: None,
-            sp_global_client: None,
             seeking_alpha_client: None,
             cnn_finance_client: None,
             yahoo_finance_client: None,
@@ -61,7 +59,7 @@ impl NewsClient {
     ///
     /// # Example
     /// ```rust
-    /// use fan_rs::NewsClient;
+    /// use finance_news_aggregator_rs::NewsClient;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -83,7 +81,7 @@ impl NewsClient {
     ///
     /// # Example
     /// ```rust
-    /// use fan_rs::NewsClient;
+    /// use finance_news_aggregator_rs::NewsClient;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -105,7 +103,7 @@ impl NewsClient {
     ///
     /// # Example
     /// ```rust
-    /// use fan_rs::NewsClient;
+    /// use finance_news_aggregator_rs::NewsClient;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -127,7 +125,7 @@ impl NewsClient {
     ///
     /// # Example
     /// ```rust
-    /// use fan_rs::NewsClient;
+    /// use finance_news_aggregator_rs::NewsClient;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -145,33 +143,11 @@ impl NewsClient {
         self.market_watch_client.as_ref().unwrap()
     }
 
-    /// Get S&P Global client
-    ///
-    /// # Example
-    /// ```rust
-    /// use fan_rs::NewsClient;
-    ///
-    /// #[tokio::main]
-    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    ///     let mut client = NewsClient::new();
-    ///     let sp = client.sp_global();
-    ///     //let research = sp.research().await?;
-    ///     //println!("Found {} articles", research.len());
-    ///     Ok(())
-    /// }
-    /// ```
-    pub fn sp_global(&mut self) -> &SPGlobal {
-        if self.sp_global_client.is_none() {
-            self.sp_global_client = Some(SPGlobal::new(self.http_client.clone()));
-        }
-        self.sp_global_client.as_ref().unwrap()
-    }
-
     /// Get Seeking Alpha client
     ///
     /// # Example
     /// ```rust
-    /// use fan_rs::NewsClient;
+    /// use finance_news_aggregator_rs::NewsClient;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -193,7 +169,7 @@ impl NewsClient {
     ///
     /// # Example
     /// ```rust
-    /// use fan_rs::NewsClient;
+    /// use finance_news_aggregator_rs::NewsClient;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -215,7 +191,7 @@ impl NewsClient {
     ///
     /// # Example
     /// ```rust
-    /// use fan_rs::NewsClient;
+    /// use finance_news_aggregator_rs::NewsClient;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -241,7 +217,7 @@ impl NewsClient {
     ///
     /// # Example
     /// ```rust
-    /// use fan_rs::NewsClient;
+    /// use finance_news_aggregator_rs::NewsClient;
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -285,7 +261,6 @@ mod tests {
         assert!(client.cnbc_client.is_none());
         assert!(client.nasdaq_client.is_none());
         assert!(client.market_watch_client.is_none());
-        assert!(client.sp_global_client.is_none());
         assert!(client.seeking_alpha_client.is_none());
         assert!(client.cnn_finance_client.is_none());
         assert!(client.yahoo_finance_client.is_none());
@@ -319,12 +294,6 @@ mod tests {
         assert!(client.market_watch_client.is_some());
     }
 
-    #[tokio::test]
-    async fn test_sp_global_client_access() {
-        let mut client = NewsClient::new();
-        let _sp = client.sp_global();
-        assert!(client.sp_global_client.is_some());
-    }
 
     #[tokio::test]
     async fn test_seeking_alpha_client_access() {
@@ -356,7 +325,6 @@ mod tests {
         let _cnbc = client.cnbc();
         let _nasdaq = client.nasdaq();
         let _mw = client.market_watch();
-        let _sp = client.sp_global();
         let _sa = client.seeking_alpha();
         let _cnn = client.cnn_finance();
         let _yahoo = client.yahoo_finance();
@@ -366,7 +334,6 @@ mod tests {
         assert!(client.cnbc_client.is_some());
         assert!(client.nasdaq_client.is_some());
         assert!(client.market_watch_client.is_some());
-        assert!(client.sp_global_client.is_some());
         assert!(client.seeking_alpha_client.is_some());
         assert!(client.cnn_finance_client.is_some());
         assert!(client.yahoo_finance_client.is_some());
