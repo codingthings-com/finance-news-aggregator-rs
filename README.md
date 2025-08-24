@@ -77,25 +77,8 @@ async fn main() -> Result<()> {
 }
 ```
 
-### Command Line Usage
+See src/news_source/*.rs for the available feeds for each source.
 
-```bash
-# Fetch WSJ opinions
-cargo run --example all_sources_example
-
-
-# Enable logging
-RUST_LOG=info cargo run --bin fan wsj opinions
-```
-
-### Available WSJ Feeds
-
-- `opinions` - Opinion articles
-- `world` - World news
-- `business` - US business news  
-- `market` - Market news
-- `tech` - Technology news
-- `lifestyle` - Lifestyle articles
 
 ## Examples
 
@@ -182,18 +165,3 @@ MIT License - see LICENSE file for details.
 4. Ensure all tests pass
 5. Submit a pull request
 
-## Roadmap
-
-- [x] Add CNBC support
-- [x] Add NASDAQ support  
-- [x] Add MarketWatch support
-- [x] Add CNN Finance support
-- [x] Add Seeking Alpha support
-- [x] Add Yahoo Finance support
-- [x] Add S&P Global support
-- [ ] Add configuration file support
-- [ ] Add filtering and search capabilities
-- [ ] Add caching support
-- [ ] Add rate limiting
-- [ ] Add async streaming support
-- [ ] Add WebSocket feeds for real-time data
