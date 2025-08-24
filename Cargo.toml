@@ -1,0 +1,24 @@
+[package]
+name = "finance-news-aggregator-rs"
+version = "0.1.0"
+edition = "2024"
+description = "Finance News Aggregator - Rust port of the Python finance-news-aggregator"
+license = "MIT"
+authors = ["codingthings <hello@codingthings.com>"]
+
+
+[dependencies]
+tokio = { version = "1.0", features = ["full"] }
+reqwest = { version = "0.12", features = ["json"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+quick-xml = { version = "0.38.1", features = ["serialize"] }
+thiserror = "2.0.16"
+anyhow = "1.0"
+env_logger = "0.11"
+log = "0.4"
+fake_user_agent = "0.2"
+async-trait = "0.1"
+
+[dev-dependencies]
+tokio-test = "0.4"
