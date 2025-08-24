@@ -2,17 +2,6 @@
 
 A Rust port of the Python `finance-news-aggregator` library for aggregating financial news from various sources.
 
-## Features
-
-- **Async/Await Support**: Built with Tokio for efficient async operations
-- **Modular Design**: Easy to extend with new news sources
-- **Error Handling**: Comprehensive error types with `thiserror`
-- **Robust XML Parsing**: Handles various RSS/XML formats with namespace support
-- **UTF-8 Safety**: Graceful handling of invalid UTF-8 sequences in feeds
-- **Logging**: Built-in logging with `env_logger`
-- **JSON Export**: Save articles to JSON files
-- **Type Safety**: Strongly typed with Serde serialization
-- **Configurable**: Customizable timeouts, user agents, and retry policies
 
 ## Currently Supported Sources
 
@@ -151,6 +140,19 @@ Logging can be updated with the `RUST_LOG` environment variable.
 ```
 export RUST_LOG=debug 
 ```
+
+
+## Features
+
+- **Async/Await Support**: Built with Tokio for efficient async operations
+- **Modular Design**: Easy to extend with new news sources
+- **Error Handling**: Comprehensive error types with `thiserror`
+- **Robust XML Parsing**: Handles various RSS/XML formats with namespace support
+- **UTF-8 Safety**: Graceful handling of invalid UTF-8 sequences in feeds
+- **Logging**: Built-in logging with `env_logger`
+- **JSON Export**: Save articles to JSON files
+- **Type Safety**: Strongly typed with Serde serialization
+- **Configurable**: Customizable timeouts, user agents, and retry policies
 
 
 ## License
