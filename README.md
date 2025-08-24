@@ -33,6 +33,13 @@ Add this to your `Cargo.toml`:
 finance-news-aggregator-rs = "0.1.0"
 ```
 
+or
+
+```toml
+[dependencies]
+finance-news-aggregator-rs = { git = "https://github.com/codingthings-com/finance-news-aggregator-rs.git" }
+```
+
 ## Usage
 
 ### Library Usage
