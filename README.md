@@ -1,6 +1,6 @@
 # Finance News Aggregator (finance-news-aggregator-rs)
 
-A Rust port of the Python `finnews` library for aggregating financial news from various sources.
+A Rust port of the Python `finance-news-aggregator` library for aggregating financial news from various sources.
 
 ## Features
 
