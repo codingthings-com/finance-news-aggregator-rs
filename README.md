@@ -2,6 +2,8 @@
 
 A Rust port of the Python finance-news-aggregator ([link](https://github.com/areed1192/finance-news-aggregator)) library for aggregating financial news from various sources.
 
+Available at: https://crates.io/crates/finance-news-aggregator-rs
+
 
 ## Currently Supported Sources
 
