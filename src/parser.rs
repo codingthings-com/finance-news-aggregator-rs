@@ -147,7 +147,10 @@ impl NewsParser {
     /// # Ok::<(), finance_news_aggregator_rs::error::FanError>(())
     /// ```
     pub fn parse_response(&self, content: &str) -> Result<Vec<NewsArticle>> {
-        let mut reader = Reader::from_str(content);
+        // Pre-process the content to handle Unicode entities before XML parsing
+        let preprocessed_content = self.preprocess_unicode_entities(content);
+
+        let mut reader = Reader::from_str(&preprocessed_content);
         reader.config_mut().trim_text(true);
 
         let mut articles = Vec::new();
@@ -159,8 +162,15 @@ impl NewsParser {
         loop {
             match reader.read_event_into(&mut buf) {
                 Ok(Event::Start(ref e)) => {
-                    let tag_name = String::from_utf8_lossy(e.name().as_ref()).to_string();
-                    current_tag = self.clean_tag_name(&tag_name);
+                    let tag_name = e.name();
+                    let tag_str = match std::str::from_utf8(tag_name.as_ref()) {
+                        Ok(s) => s,
+                        Err(_) => {
+                            log::warn!("Invalid UTF-8 in tag name");
+                            continue;
+                        }
+                    };
+                    current_tag = self.clean_tag_name(tag_str);
 
                     if current_tag == "item" {
                         in_item = true;
@@ -169,14 +179,51 @@ impl NewsParser {
                 }
                 Ok(Event::Text(e)) => {
                     if in_item && !current_tag.is_empty() {
-                        // Convert bytes to UTF-8 string, replacing invalid sequences
-                        let text = String::from_utf8_lossy(&e).to_string();
+                        // Use the reader to decode entities properly
+                        let mut text = match reader.decoder().decode(&e) {
+                            Ok(cow_str) => cow_str.into_owned(),
+                            Err(err) => {
+                                log::warn!("Failed to decode text: {}", err);
+                                // Fallback to raw UTF-8 conversion
+                                match std::str::from_utf8(&e) {
+                                    Ok(s) => s.to_string(),
+                                    Err(_) => {
+                                        log::warn!("Invalid UTF-8 in text content");
+                                        continue;
+                                    }
+                                }
+                            }
+                        };
+
+                        // Handle Unicode entities that the decoder might miss
+                        text = self.decode_unicode_entities(&text);
+
+                        self.set_article_field(&mut current_article, &current_tag, text);
+                    }
+                }
+                Ok(Event::CData(e)) => {
+                    if in_item && !current_tag.is_empty() {
+                        // Handle CDATA sections
+                        let text = match std::str::from_utf8(&e) {
+                            Ok(s) => s.to_string(),
+                            Err(_) => {
+                                log::warn!("Invalid UTF-8 in CDATA section");
+                                continue;
+                            }
+                        };
                         self.set_article_field(&mut current_article, &current_tag, text);
                     }
                 }
                 Ok(Event::End(ref e)) => {
-                    let tag_name = String::from_utf8_lossy(e.name().as_ref()).to_string();
-                    let clean_tag = self.clean_tag_name(&tag_name);
+                    let tag_name = e.name();
+                    let tag_str = match std::str::from_utf8(tag_name.as_ref()) {
+                        Ok(s) => s,
+                        Err(_) => {
+                            log::warn!("Invalid UTF-8 in end tag name");
+                            continue;
+                        }
+                    };
+                    let clean_tag = self.clean_tag_name(tag_str);
 
                     if clean_tag == "item" && in_item {
                         articles.push(current_article.clone());
@@ -215,22 +262,124 @@ impl NewsParser {
         clean_tag
     }
 
+    /// Preprocess the entire XML content to handle Unicode entities before parsing
+    ///
+    /// This ensures that Unicode quotation marks are converted to regular apostrophes
+    /// before the XML parser splits them into separate text nodes
+    fn preprocess_unicode_entities(&self, content: &str) -> String {
+        content
+            .replace("&#x2018;", "'") // Left single quotation mark
+            .replace("&#x2019;", "'") // Right single quotation mark
+            .replace("&#x201C;", "\"") // Left double quotation mark
+            .replace("&#x201D;", "\"") // Right double quotation mark
+            .replace("&#8216;", "'") // Left single quotation mark (decimal)
+            .replace("&#8217;", "'") // Right single quotation mark (decimal)
+            .replace("&#8220;", "\"") // Left double quotation mark (decimal)
+            .replace("&#8221;", "\"") // Right double quotation mark (decimal)
+    }
+
+    /// Decode Unicode entities that might not be handled by the XML decoder
+    ///
+    /// Handles numeric character references like &#x2018; and &#x2019; for proper apostrophes
+    fn decode_unicode_entities(&self, text: &str) -> String {
+        let mut result = text.to_string();
+
+        // Handle hexadecimal numeric character references
+        while let Some(start) = result.find("&#x") {
+            if let Some(end) = result[start..].find(';') {
+                let entity = &result[start..start + end + 1];
+                let hex_part = &entity[3..entity.len() - 1]; // Remove &#x and ;
+
+                if let Ok(code_point) = u32::from_str_radix(hex_part, 16) {
+                    if let Some(character) = char::from_u32(code_point) {
+                        result = result.replace(entity, &character.to_string());
+                        continue;
+                    }
+                }
+                // If we can't decode it, just remove the entity to avoid infinite loop
+                result = result.replace(entity, "");
+            } else {
+                break;
+            }
+        }
+
+        // Handle decimal numeric character references
+        while let Some(start) = result.find("&#") {
+            if result.chars().nth(start + 2) == Some('x') {
+                // Skip hex entities (already handled above)
+                if let Some(next_entity) = result[start + 1..].find("&#") {
+                    let new_start = start + 1 + next_entity;
+                    if new_start <= start {
+                        break; // Avoid infinite loop
+                    }
+                    continue;
+                } else {
+                    break;
+                }
+            }
+
+            if let Some(end) = result[start..].find(';') {
+                let entity = &result[start..start + end + 1];
+                let decimal_part = &entity[2..entity.len() - 1]; // Remove &# and ;
+
+                if let Ok(code_point) = decimal_part.parse::<u32>() {
+                    if let Some(character) = char::from_u32(code_point) {
+                        result = result.replace(entity, &character.to_string());
+                        continue;
+                    }
+                }
+                // If we can't decode it, just remove the entity to avoid infinite loop
+                result = result.replace(entity, "");
+            } else {
+                break;
+            }
+        }
+
+        result
+    }
+
     /// Set the appropriate field in NewsArticle based on tag name
     ///
     /// Maps XML tag names to NewsArticle fields. Standard RSS tags like "title",
     /// "link", "description" are mapped to their corresponding fields, while
     /// unknown tags are stored in the `extra_fields` HashMap.
+    ///
+    /// This method handles text accumulation for cases where XML content spans multiple text nodes.
     fn set_article_field(&self, article: &mut NewsArticle, tag: &str, value: String) {
         match tag.to_lowercase().as_str() {
-            "title" => article.title = Some(value),
-            "link" => article.link = Some(value),
-            "description" => article.description = Some(value),
+            "title" => {
+                if let Some(existing) = &article.title {
+                    article.title = Some(format!("{}{}", existing, value));
+                } else {
+                    article.title = Some(value);
+                }
+            }
+            "link" => {
+                if let Some(existing) = &article.link {
+                    article.link = Some(format!("{}{}", existing, value));
+                } else {
+                    article.link = Some(value);
+                }
+            }
+            "description" => {
+                if let Some(existing) = &article.description {
+                    article.description = Some(format!("{}{}", existing, value));
+                } else {
+                    article.description = Some(value);
+                }
+            }
             "pubdate" => article.pub_date = Some(value),
             "guid" => article.guid = Some(value),
             "category" => article.category = Some(value),
             "author" | "creator" => article.author = Some(value),
             _ => {
-                article.extra_fields.insert(tag.to_string(), value);
+                if let Some(existing) = article.extra_fields.get(tag) {
+                    article
+                        .extra_fields
+                        .insert(tag.to_string(), format!("{}{}", existing, value));
+                } else {
+                    article.extra_fields.insert(tag.to_string(), value);
+                }
             }
         }
     }
