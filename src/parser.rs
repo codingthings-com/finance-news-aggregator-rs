@@ -290,12 +290,11 @@ impl NewsParser {
                 let entity = &result[start..start + end + 1];
                 let hex_part = &entity[3..entity.len() - 1]; // Remove &#x and ;
 
-                if let Ok(code_point) = u32::from_str_radix(hex_part, 16) {
-                    if let Some(character) = char::from_u32(code_point) {
+                if let Ok(code_point) = u32::from_str_radix(hex_part, 16)
+                    && let Some(character) = char::from_u32(code_point) {
                         result = result.replace(entity, &character.to_string());
                         continue;
                     }
-                }
                 // If we can't decode it, just remove the entity to avoid infinite loop
                 result = result.replace(entity, "");
             } else {
@@ -322,12 +321,11 @@ impl NewsParser {
                 let entity = &result[start..start + end + 1];
                 let decimal_part = &entity[2..entity.len() - 1]; // Remove &# and ;
 
-                if let Ok(code_point) = decimal_part.parse::<u32>() {
-                    if let Some(character) = char::from_u32(code_point) {
+                if let Ok(code_point) = decimal_part.parse::<u32>()
+                    && let Some(character) = char::from_u32(code_point) {
                         result = result.replace(entity, &character.to_string());
                         continue;
                     }
-                }
                 // If we can't decode it, just remove the entity to avoid infinite loop
                 result = result.replace(entity, "");
             } else {

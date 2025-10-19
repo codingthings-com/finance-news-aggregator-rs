@@ -13,7 +13,7 @@ Available at: https://crates.io/crates/finance-news-aggregator-rs
 - **MarketWatch**: Top Stories, Real-time Headlines, Market Pulse, Bulletins, Personal Finance, etc.
 - **Seeking Alpha**: Latest Articles, Market News, Long/Short Ideas, IPO Analysis, Transcripts, etc.
 - **CNN Finance**: All Stories, Companies, Economy, Markets, Media, Technology, etc.
-- **Yahoo Finance**: General News, Market Summary, Headlines by Symbol, Industry News
+- **Yahoo Finance**: General News
 
 ## Installation
 
@@ -21,7 +21,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-finance-news-aggregator-rs = "0.1.2"
+finance-news-aggregator-rs = "0.1.3"
 ```
 
 or
