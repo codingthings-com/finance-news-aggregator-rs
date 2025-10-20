@@ -21,7 +21,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-finance-news-aggregator-rs = "0.1.3"
+finance-news-aggregator-rs = "0.1.4"
 ```
 
 or

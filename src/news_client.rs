@@ -197,7 +197,7 @@ impl NewsClient {
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let mut client = NewsClient::new();
     ///     let yahoo = client.yahoo_finance();
-    ///     let news = yahoo.news().await?;
+    ///     let news = yahoo.headlines().await?;
     ///     println!("Found {} articles", news.len());
     ///     Ok(())
     /// }

@@ -1,6 +1,6 @@
 [package]
 name = "finance-news-aggregator-rs"
-version = "0.1.3"
+version = "0.1.4"
 edition = "2024"
 description = "Finance News Aggregator - Rust port of the Python finance-news-aggregator"
 license = "MIT"
@@ -30,3 +30,5 @@ async-trait = "0.1"
 
 [dev-dependencies]
 tokio-test = "0.4"
+reqwest = { version = "0.12", features = ["json"] }
+chrono = { version = "0.4", features = ["serde"] }
