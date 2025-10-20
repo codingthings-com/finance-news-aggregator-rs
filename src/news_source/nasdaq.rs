@@ -3,7 +3,7 @@ use crate::news_source::NewsSource;
 use crate::parser::NewsParser;
 use crate::types::NewsArticle;
 use async_trait::async_trait;
-use log::{debug, info};
+use log::debug;
 use reqwest::Client;
 
 /// NASDAQ news client
@@ -28,7 +28,7 @@ impl NASDAQ {
     /// Get original content feed
     pub async fn original_content(&self) -> Result<Vec<NewsArticle>> {
         let url = &self.original_content_url;
-        info!("Fetching NASDAQ original content: {}", url);
+        debug!("Fetching NASDAQ original content: {}", url);
 
         let response = self.client.get(url).send().await?;
         let content = response.text().await?;
@@ -42,7 +42,7 @@ impl NASDAQ {
             article.source = Some(self.name().to_string());
         }
 
-        info!(
+        debug!(
             "Parsed {} articles from NASDAQ original content",
             articles.len()
         );
@@ -52,7 +52,7 @@ impl NASDAQ {
     /// Get feed by category
     pub async fn feed_by_category(&self, category: &str) -> Result<Vec<NewsArticle>> {
         let url = format!("{}?category={}", self.base_url, category);
-        info!("Fetching NASDAQ feed: {}", url);
+        debug!("Fetching NASDAQ feed: {}", url);
 
         let response = self.client.get(&url).send().await?;
         let content = response.text().await?;
@@ -66,7 +66,7 @@ impl NASDAQ {
             article.source = Some(self.name().to_string());
         }
 
-        info!(
+        debug!(
             "Parsed {} articles from NASDAQ category {}",
             articles.len(),
             category

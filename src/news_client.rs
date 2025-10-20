@@ -1,7 +1,7 @@
 use crate::Result;
 use crate::news_source::*;
 use crate::types::{NewsArticle, SourceConfig};
-use log::info;
+use log::debug;
 use reqwest::Client;
 use serde_json;
 use std::fs::File;
@@ -29,7 +29,7 @@ impl NewsClient {
 
     /// Create a new NewsClient instance with custom configuration
     pub fn with_config(config: SourceConfig) -> Self {
-        info!("Creating new NewsClient with config");
+        debug!("Creating new NewsClient with config");
 
         let http_client = Client::builder()
             .timeout(config.timeout_duration())
@@ -239,7 +239,7 @@ impl NewsClient {
         let mut file = File::create(&file_path)?;
         file.write_all(json_content.as_bytes())?;
 
-        info!("Saved {} articles to {:?}", articles.len(), file_path);
+        debug!("Saved {} articles to {:?}", articles.len(), file_path);
         Ok(())
     }
 }

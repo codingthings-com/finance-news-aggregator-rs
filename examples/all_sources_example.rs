@@ -115,7 +115,7 @@ async fn main() -> Result<()> {
     // Yahoo Finance
     println!("\n=== Yahoo Finance ===");
     let yahoo_finance = news_client.yahoo_finance();
-    match yahoo_finance.news().await {
+    match yahoo_finance.headlines().await {
         Ok(articles) => {
             println!("Yahoo Finance News: {} articles", articles.len());
             for (i, article) in articles.iter().enumerate() {

@@ -3,7 +3,7 @@ use crate::news_source::NewsSource;
 use crate::parser::NewsParser;
 use crate::types::NewsArticle;
 use async_trait::async_trait;
-use log::{debug, info};
+use log::debug;
 use reqwest::Client;
 use std::collections::HashMap;
 
@@ -133,7 +133,7 @@ impl NewsSource for MarketWatch {
 
     async fn fetch_feed(&self, topic: &str) -> Result<Vec<NewsArticle>> {
         let url = self.base_url.replace("{topic}", topic);
-        info!("Fetching MarketWatch feed: {}", url);
+        debug!("Fetching MarketWatch feed: {}", url);
 
         let response = self.client.get(&url).send().await?;
         let content = response.text().await?;
@@ -147,7 +147,7 @@ impl NewsSource for MarketWatch {
             article.source = Some(self.name().to_string());
         }
 
-        info!(
+        debug!(
             "Parsed {} articles from MarketWatch topic {}",
             articles.len(),
             topic

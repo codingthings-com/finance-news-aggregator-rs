@@ -3,7 +3,7 @@ use crate::news_source::NewsSource;
 use crate::parser::NewsParser;
 use crate::types::{NewsArticle, SourceConfig};
 use async_trait::async_trait;
-use log::{debug, info};
+use log::debug;
 use reqwest::Client;
 use std::collections::HashMap;
 
@@ -110,7 +110,7 @@ impl NewsSource for CNBC {
 
     async fn fetch_feed(&self, topic_id: &str) -> Result<Vec<NewsArticle>> {
         let url = self.config.base_url.replace("{topic_id}", topic_id);
-        info!("Fetching CNBC feed: {}", url);
+        debug!("Fetching CNBC feed: {}", url);
 
         let response = self.client.get(&url).send().await?;
         let content = response.text().await?;
@@ -124,7 +124,7 @@ impl NewsSource for CNBC {
             article.source = Some(self.name().to_string());
         }
 
-        info!(
+        debug!(
             "Parsed {} articles from CNBC topic {}",
             articles.len(),
             topic_id

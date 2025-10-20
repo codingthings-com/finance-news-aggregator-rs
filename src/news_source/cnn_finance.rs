@@ -3,7 +3,7 @@ use crate::news_source::NewsSource;
 use crate::parser::NewsParser;
 use crate::types::NewsArticle;
 use async_trait::async_trait;
-use log::{debug, info};
+use log::debug;
 use reqwest::Client;
 
 /// CNN Finance news client
@@ -78,7 +78,7 @@ impl CNNFinance {
     /// Get morning buzz
     pub async fn morning_buzz(&self) -> Result<Vec<NewsArticle>> {
         let url = &self.buzz_url;
-        info!("Fetching CNN Finance morning buzz: {}", url);
+        debug!("Fetching CNN Finance morning buzz: {}", url);
 
         let response = self.client.get(url).send().await?;
         let content = response.text().await?;
@@ -92,7 +92,7 @@ impl CNNFinance {
             article.source = Some(self.name().to_string());
         }
 
-        info!(
+        debug!(
             "Parsed {} articles from CNN Finance morning buzz",
             articles.len()
         );
@@ -112,7 +112,7 @@ impl NewsSource for CNNFinance {
 
     async fn fetch_feed(&self, topic: &str) -> Result<Vec<NewsArticle>> {
         let url = self.base_url.replace("{topic}", topic);
-        info!("Fetching CNN Finance feed: {}", url);
+        debug!("Fetching CNN Finance feed: {}", url);
 
         let response = self.client.get(&url).send().await?;
         let content = response.text().await?;
@@ -126,7 +126,7 @@ impl NewsSource for CNNFinance {
             article.source = Some(self.name().to_string());
         }
 
-        info!(
+        debug!(
             "Parsed {} articles from CNN Finance topic {}",
             articles.len(),
             topic

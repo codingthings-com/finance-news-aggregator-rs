@@ -3,7 +3,7 @@ use crate::news_source::NewsSource;
 use crate::parser::NewsParser;
 use crate::types::{NewsArticle, SourceConfig};
 use async_trait::async_trait;
-use log::{debug, info};
+use log::debug;
 use reqwest::Client;
 
 /// Wall Street Journal news client
@@ -77,7 +77,7 @@ impl NewsSource for WallStreetJournal {
 
     async fn fetch_feed(&self, topic: &str) -> Result<Vec<NewsArticle>> {
         let url = self.config.base_url.replace("{topic}", topic);
-        info!("Fetching WSJ feed: {}", url);
+        debug!("Fetching WSJ feed: {}", url);
 
         let response = self.client.get(&url).send().await?;
         let content = response.text().await?;
@@ -91,7 +91,7 @@ impl NewsSource for WallStreetJournal {
             article.source = Some(self.name().to_string());
         }
 
-        info!("Parsed {} articles from WSJ {}", articles.len(), topic);
+        debug!("Parsed {} articles from WSJ {}", articles.len(), topic);
         Ok(articles)
     }
 

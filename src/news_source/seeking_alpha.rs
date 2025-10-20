@@ -3,7 +3,7 @@ use crate::news_source::NewsSource;
 use crate::parser::NewsParser;
 use crate::types::NewsArticle;
 use async_trait::async_trait;
-use log::{debug, info};
+use log::debug;
 use reqwest::Client;
 
 /// Seeking Alpha news client
@@ -112,7 +112,7 @@ impl NewsSource for SeekingAlpha {
 
     async fn fetch_feed(&self, category: &str) -> Result<Vec<NewsArticle>> {
         let url = format!("{}?category={}", self.base_url, category);
-        info!("Fetching Seeking Alpha feed: {}", url);
+        debug!("Fetching Seeking Alpha feed: {}", url);
 
         let response = self.client.get(&url).send().await?;
         let content = response.text().await?;
@@ -126,7 +126,7 @@ impl NewsSource for SeekingAlpha {
             article.source = Some(self.name().to_string());
         }
 
-        info!(
+        debug!(
             "Parsed {} articles from Seeking Alpha {}",
             articles.len(),
             category
