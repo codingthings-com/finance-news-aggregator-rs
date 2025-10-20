@@ -84,8 +84,71 @@ cargo run --example all_sources_example
 
 ### Running Tests
 
+#### Unit Tests
+Run all unit tests:
+```bash
+cargo test --lib
+```
+
+#### Integration Tests
+Run all integration tests:
+```bash
+cargo test --test '*'
+```
+
+Run specific integration test files:
+```bash
+# CNN Finance integration tests
+cargo test --test test_cnn_finance_integration
+
+# CNBC integration tests  
+cargo test --test test_cnbc_integration
+```
+
+#### Deprecation Detection Tests
+Run CNN Finance deprecation detection tests specifically:
+```bash
+# Test base URL endpoint availability
+cargo test test_cnn_finance_base_url_endpoint_availability --test test_cnn_finance_integration
+
+# Test buzz URL endpoint availability
+cargo test test_cnn_finance_buzz_url_endpoint_availability --test test_cnn_finance_integration
+
+# Test for deprecated feed categories
+cargo test test_cnn_finance_deprecated_feed_categories --test test_cnn_finance_integration
+
+# Comprehensive endpoint monitoring with deprecation tracker
+cargo test test_cnn_finance_endpoint_monitoring_with_deprecation_tracker --test test_cnn_finance_integration
+```
+
+#### Data Validation Tests
+Run data validation and quality tests:
+```bash
+# CNN Finance data validation
+cargo test test_cnn_finance_article_structure_validation --test test_cnn_finance_integration
+cargo test test_cnn_finance_newsarticle_data_quality --test test_cnn_finance_integration
+```
+
+#### Run All Tests
+Run both unit and integration tests:
 ```bash
 cargo test
+```
+
+#### Test Output
+The integration tests provide detailed output including:
+- Endpoint availability status
+- Article count per feed
+- Deprecation warnings and recommendations
+- Error classification (404/403 vs temporary failures)
+- Comprehensive deprecation reports
+
+Example output:
+```
+✓ CNN Finance base_url endpoint is available
+✓ Category 'money_latest' is working (15 articles)
+✗ Category 'deprecated_topic' appears deprecated (404)
+WARNING: CNN Finance has critical failures that may indicate deprecated endpoints
 ```
 
 ### Building
@@ -101,6 +164,27 @@ cargo build --release
 3. Add parser support in `src/parser.rs`
 4. Export the new source in `src/news_source/mod.rs`
 5. Add client method in `src/news_client.rs`
+
+### Testing Framework
+
+The project includes a comprehensive integration testing framework with:
+
+#### Deprecation Detection
+- **Endpoint Monitoring**: Automatically detects when news source endpoints become unavailable
+- **Error Classification**: Distinguishes between permanent deprecation (404/403/DNS errors) and temporary issues
+- **Feed Category Tracking**: Monitors individual topic categories for deprecation
+- **Deprecation Reports**: Generates detailed reports with removal recommendations
+
+#### Data Validation
+- **Article Structure Validation**: Ensures news articles have proper structure and required fields
+- **Content Quality Checks**: Validates article titles, descriptions, and URLs
+- **Source Attribution**: Verifies correct source attribution for all articles
+
+#### Test Utilities
+- **Integration Test Config**: Configurable test parameters and timeouts
+- **Deprecation Tracker**: Utility for tracking and reporting endpoint failures
+- **Article Validation Rules**: Flexible validation rules for different data quality requirements
+- **Client Factory**: Standardized HTTP client creation for consistent testing
 
 ## Project Structure
 
@@ -155,6 +239,8 @@ export RUST_LOG=debug
 - **JSON Export**: Save articles to JSON files
 - **Type Safety**: Strongly typed with Serde serialization
 - **Configurable**: Customizable timeouts, user agents, and retry policies
+- **Integration Testing**: Comprehensive test suite with deprecation detection
+- **Endpoint Monitoring**: Automated detection of deprecated news feeds and endpoints
 
 
 ## License

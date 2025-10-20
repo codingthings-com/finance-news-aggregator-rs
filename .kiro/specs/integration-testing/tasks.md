@@ -42,24 +42,24 @@
   - Test that articles contain valid titles, links, and properly formatted publication dates
   - _Requirements: 2.1, 2.2, 2.3_
 
-- [-] 2.2 Create CNBC deprecation tests
+- [x] 2.2 Create CNBC deprecation tests
 
   - Implement deprecation detection for outdated CNBC RSS feed IDs
   - _Requirements: 3.3, 5.1, 5.2_
 
-- [ ] 3. Implement CNN Finance integration tests
+- [x] 3. Implement CNN Finance integration tests
 
   - Create tests/integration/test_cnn_finance.rs testing all CNNFinance public methods
   - Test all_stories(), companies(), economy(), international(), investing(), markets(), media(), etc.
   - _Requirements: 1.1, 1.2, 1.3, 4.1_
 
-- [ ] 3.1 Add CNN Finance data validation
+- [x] 3.1 Add CNN Finance data validation
 
   - Validate CNNFinance NewsArticle data structure and content quality
   - Test morning_buzz() and personal_finance() specific functionality
   - _Requirements: 2.1, 2.2, 2.3_
 
-- [ ]\* 3.2 Create CNN Finance deprecation detection
+- [x] 3.2 Create CNN Finance deprecation detection
 
   - Monitor CNN Finance base_url and buzz_url endpoint availability
   - Track and report deprecated CNN Finance feed categories
