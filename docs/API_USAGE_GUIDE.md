@@ -41,14 +41,18 @@ let topics = cnbc.available_topics();
 let articles = cnbc.fetch_topic("technology").await?;
 ```
 
-### 3. Direct URL Fetching
+### 3. Direct URL Fetching (Generic Source)
 
 ```rust
 use finance_news_aggregator_rs::news_source::NewsSource;
 
-let wsj = client.wsj();
+// Use the generic source for any RSS feed
+let generic = client.generic();
 let url = "https://feeds.a.dj.com/rss/RSSOpinion.xml";
-let articles = wsj.fetch_feed_by_url(url).await?;
+let articles = generic.fetch_feed_by_url(url).await?;
+
+// Works with any RSS feed
+let custom_feed = generic.fetch_feed_by_url("https://example.com/feed.xml").await?;
 ```
 
 ## Available Feeds

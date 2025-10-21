@@ -20,7 +20,7 @@ A Rust library for aggregating financial news from various RSS feed sources. Por
 
 ```toml
 [dependencies]
-finance-news-aggregator-rs = "0.2.0"
+finance-news-aggregator-rs = "0.2.1"
 ```
 
 ## Quick Start
@@ -71,6 +71,17 @@ let crypto = nasdaq.cryptocurrency().await?;
 let yahoo = client.yahoo_finance();
 let headlines = yahoo.headlines().await?;
 let aapl_news = yahoo.headline(&["AAPL", "MSFT"]).await?;
+```
+
+### Generic Source (Any RSS Feed)
+
+Fetch any RSS feed directly without using a specific source:
+
+```rust
+use finance_news_aggregator_rs::news_source::NewsSource;
+
+let generic = client.generic();
+let articles = generic.fetch_feed_by_url("https://example.com/feed.xml").await?;
 ```
 
 ### Topic-Based API

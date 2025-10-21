@@ -1,5 +1,17 @@
 # Release Notes
 
+## v0.2.1 - Generic Source Support
+
+### New Features
+
+- **Generic Source**: New `client.generic()` method for fetching any RSS feed without needing a specific source
+  ```rust
+  let generic = client.generic();
+  let articles = generic.fetch_feed_by_url("https://example.com/feed.xml").await?;
+  ```
+- Simplifies fetching arbitrary RSS feeds - no need to instantiate a specific news source
+- See `examples/generic_feed_example.rs` for usage
+
 ## v0.2.0 - Major Refactoring & Cleanup
 
 ### Breaking Changes

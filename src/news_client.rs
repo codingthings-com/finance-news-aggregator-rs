@@ -12,6 +12,7 @@ use std::path::Path;
 pub struct NewsClient {
     http_client: Client,
     default_config: SourceConfig,
+    generic_client: Option<GenericSource>,
     wsj_client: Option<WallStreetJournal>,
     cnbc_client: Option<CNBC>,
     nasdaq_client: Option<NASDAQ>,
@@ -40,6 +41,7 @@ impl NewsClient {
         Self {
             http_client,
             default_config: config,
+            generic_client: None,
             wsj_client: None,
             cnbc_client: None,
             nasdaq_client: None,
@@ -53,6 +55,29 @@ impl NewsClient {
     /// Get the default configuration
     pub fn config(&self) -> &SourceConfig {
         &self.default_config
+    }
+
+    /// Get generic RSS feed client for fetching arbitrary feeds
+    ///
+    /// # Example
+    /// ```rust
+    /// use finance_news_aggregator_rs::NewsClient;
+    /// use finance_news_aggregator_rs::news_source::NewsSource;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let mut client = NewsClient::new();
+    ///     let generic = client.generic();
+    ///     let articles = generic.fetch_feed_by_url("https://example.com/rss").await?;
+    ///     println!("Found {} articles", articles.len());
+    ///     Ok(())
+    /// }
+    /// ```
+    pub fn generic(&mut self) -> &GenericSource {
+        if self.generic_client.is_none() {
+            self.generic_client = Some(GenericSource::new(self.http_client.clone()));
+        }
+        self.generic_client.as_ref().unwrap()
     }
 
     /// Get Wall Street Journal client
@@ -257,6 +282,7 @@ mod tests {
     #[test]
     fn test_client_creation() {
         let client = NewsClient::new();
+        assert!(client.generic_client.is_none());
         assert!(client.wsj_client.is_none());
         assert!(client.cnbc_client.is_none());
         assert!(client.nasdaq_client.is_none());
@@ -264,6 +290,13 @@ mod tests {
         assert!(client.seeking_alpha_client.is_none());
         assert!(client.cnn_finance_client.is_none());
         assert!(client.yahoo_finance_client.is_none());
+    }
+
+    #[tokio::test]
+    async fn test_generic_client_access() {
+        let mut client = NewsClient::new();
+        let _generic = client.generic();
+        assert!(client.generic_client.is_some());
     }
 
     #[tokio::test]
@@ -320,6 +353,7 @@ mod tests {
         let mut client = NewsClient::new();
 
         // Access all clients
+        let _generic = client.generic();
         let _wsj = client.wsj();
         let _cnbc = client.cnbc();
         let _nasdaq = client.nasdaq();
@@ -329,6 +363,7 @@ mod tests {
         let _yahoo = client.yahoo_finance();
 
         // Verify all are initialized
+        assert!(client.generic_client.is_some());
         assert!(client.wsj_client.is_some());
         assert!(client.cnbc_client.is_some());
         assert!(client.nasdaq_client.is_some());

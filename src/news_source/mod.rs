@@ -8,6 +8,7 @@ use std::collections::HashMap;
 
 pub mod cnbc;
 pub mod cnn_finance;
+pub mod generic;
 pub mod market_watch;
 pub mod nasdaq;
 pub mod seeking_alpha;
@@ -16,6 +17,7 @@ pub mod yahoo_finance;
 
 pub use cnbc::CNBC;
 pub use cnn_finance::CNNFinance;
+pub use generic::GenericSource;
 pub use market_watch::MarketWatch;
 pub use nasdaq::NASDAQ;
 pub use seeking_alpha::SeekingAlpha;

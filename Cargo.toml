@@ -1,6 +1,6 @@
 [package]
 name = "finance-news-aggregator-rs"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2024"
 description = "Finance News Aggregator - Rust port of the Python finance-news-aggregator"
 license = "MIT"
