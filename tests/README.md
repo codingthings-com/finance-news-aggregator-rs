@@ -1,270 +1,321 @@
 # Integration Test Suite
 
-This directory contains comprehensive integration tests for the finance-news-aggregator-rs library. The test suite validates all news source modules with real network requests and provides detailed reporting on functionality, performance, and deprecation status.
+This directory contains integration tests for the finance-news-aggregator-rs library. The tests validate all news source modules with real network requests to ensure RSS feeds are accessible.
 
 ## Quick Start
 
-### Run All Tests
+### Run All Integration Tests
 ```bash
-cargo test --test integration_test_suite
+cargo test --tests
 ```
 
 ### Test Specific Sources
 ```bash
-INTEGRATION_SOURCES=CNBC,WSJ cargo test --test integration_test_suite
+cargo test --test test_nasdaq_integration
+cargo test --test test_cnbc_integration
+cargo test --test test_cnn_finance_integration
+cargo test --test test_wsj_integration
+cargo test --test test_yahoo_finance_integration
+cargo test --test test_seeking_alpha_integration
+cargo test --test test_market_watch_integration
 ```
 
-### Run in CI Mode (Faster)
-```bash
-CI=1 cargo test --test integration_test_suite
-```
+## Test Philosophy
 
-## Test Categories
+The integration tests focus on **feed accessibility** rather than content validation:
 
-### 1. Comprehensive Integration Tests
-The main test suite that validates all news sources:
-```bash
-cargo test --test integration_test_suite run_comprehensive_integration_tests
-```
+✅ **What we test:**
+- Can we connect to the RSS feed?
+- Does the feed return articles?
+- Are articles properly tagged with the source name?
+- Do all topic methods work without errors?
 
-### 2. Source-Specific Tests
-Test individual news sources:
-```bash
-# Test only CNBC
-cargo test --test integration_test_suite run_cnbc_only_tests -- --ignored
+❌ **What we don't test:**
+- Article content quality or completeness
+- Specific field validation (titles, descriptions, etc.)
+- Date format validation
+- URL structure validation
 
-# Test premium sources (WSJ, Yahoo Finance)
-cargo test --test integration_test_suite run_premium_sources_tests -- --ignored
-```
-
-### 3. Performance Tests
-Monitor response times and detect regressions:
-```bash
-cargo test --test integration_test_suite run_performance_regression_tests -- --ignored
-```
-
-### 4. Deprecation Detection
-Identify outdated endpoints and broken feeds:
-```bash
-cargo test --test integration_test_suite run_deprecation_detection_tests -- --ignored
-```
-
-### 5. Network Connectivity
-Basic connectivity validation:
-```bash
-cargo test --test integration_test_suite test_network_connectivity
-```
-
-## Environment Configuration
-
-The test suite automatically adapts based on environment variables:
-
-### Test Modes
-
-| Environment | Description | Timeout | Retries | Features |
-|-------------|-------------|---------|---------|----------|
-| **Local** | Development mode | 45s | 3 | Full reporting, deprecation tracking |
-| **CI** | Continuous integration | 30s | 2 | Essential validation only |
-| **Nightly** | Comprehensive scanning | 60s | 5 | Full deprecation scan, performance tracking |
-
-### Environment Variables
-
-| Variable | Description | Default | Example |
-|----------|-------------|---------|---------|
-| `CI` | Enable CI mode | `false` | `CI=1` |
-| `NIGHTLY_BUILD` | Enable nightly mode | `false` | `NIGHTLY_BUILD=1` |
-| `INTEGRATION_SOURCES` | Sources to test | All | `CNBC,WSJ,YahooFinance` |
-| `INTEGRATION_TIMEOUT` | Network timeout (seconds) | 30-60 | `INTEGRATION_TIMEOUT=45` |
-| `INTEGRATION_RETRIES` | Max retry attempts | 2-5 | `INTEGRATION_RETRIES=3` |
-| `SKIP_NETWORK_TESTS` | Skip connectivity tests | `false` | `SKIP_NETWORK_TESTS=1` |
-| `ENABLE_DEPRECATION_TRACKING` | Track deprecated endpoints | `true` | `ENABLE_DEPRECATION_TRACKING=1` |
-| `ENABLE_PERFORMANCE_TRACKING` | Monitor performance | `true` | `ENABLE_PERFORMANCE_TRACKING=1` |
-| `VERBOSE_OUTPUT` | Detailed logging | `true` | `VERBOSE_OUTPUT=1` |
-| `PARALLEL_EXECUTION` | Run tests in parallel | `true` | `PARALLEL_EXECUTION=0` |
+This approach keeps tests fast, reliable, and focused on the main concern: **are the feeds accessible?**
 
 ## Test Structure
 
 ```
 tests/
-├── integration/
-│   ├── mod.rs                    # Module definitions
-│   ├── test_runner.rs           # Main test execution engine
-│   ├── cli_runner.rs            # Command-line interface
-│   └── utils/
-│       ├── mod.rs               # Common utilities
-│       ├── environment.rs       # Environment configuration
-│       ├── assertions.rs        # Custom assertions
-│       ├── client_factory.rs    # HTTP client setup
-│       └── deprecation_tracker.rs # Endpoint monitoring
-├── integration_test_suite.rs    # Main test entry point
-└── test_*_integration.rs        # Individual source tests
+├── README.md                           # This file
+├── test_nasdaq_integration.rs          # NASDAQ tests
+├── test_cnbc_integration.rs            # CNBC tests
+├── test_cnn_finance_integration.rs     # CNN Finance tests
+├── test_wsj_integration.rs             # Wall Street Journal tests
+├── test_yahoo_finance_integration.rs   # Yahoo Finance tests
+├── test_seeking_alpha_integration.rs   # Seeking Alpha tests
+├── test_market_watch_integration.rs    # MarketWatch tests
+└── integration/                        # Test utilities
+    ├── mod.rs
+    ├── test_runner.rs                  # Comprehensive test runner
+    └── utils/
+        ├── mod.rs
+        ├── client_factory.rs           # HTTP client setup
+        ├── environment.rs              # Environment configuration
+        ├── assertions.rs               # Custom assertions
+        └── deprecation_tracker.rs      # Endpoint monitoring
 ```
 
-## Usage Examples
+## Individual Source Tests
 
-### Development Workflow
+Each source has its own test file with a consistent structure:
 
-```bash
-# Quick validation during development
-cargo test --test integration_test_suite
-
-# Test changes to specific source
-INTEGRATION_SOURCES=CNBC cargo test --test integration_test_suite
-
-# Debug network issues
-VERBOSE_OUTPUT=1 cargo test --test integration_test_suite test_network_connectivity
-```
-
-### CI/CD Pipeline
-
-```bash
-# Fast CI validation
-CI=1 INTEGRATION_TIMEOUT=20 cargo test --test integration_test_suite
-
-# Nightly comprehensive scan
-NIGHTLY_BUILD=1 cargo test --test integration_test_suite
-```
-
-### Performance Monitoring
-
-```bash
-# Check for performance regressions
-ENABLE_PERFORMANCE_TRACKING=1 cargo test --test integration_test_suite
-
-# Run performance-specific tests
-cargo test --test integration_test_suite run_performance_regression_tests -- --ignored
-```
-
-### Deprecation Management
-
-```bash
-# Scan for deprecated endpoints
-ENABLE_DEPRECATION_TRACKING=1 cargo test --test integration_test_suite
-
-# Comprehensive deprecation analysis
-cargo test --test integration_test_suite run_deprecation_detection_tests -- --ignored
-```
-
-## Test Output
-
-### Success Example
-```
-🚀 Starting comprehensive integration test suite
-Environment: Local
-Configuration: EnvironmentConfig { test_mode: Local, timeout_seconds: 45, ... }
-
-🔄 Running tests in parallel mode
-✅ Completed tests for CNBC
-✅ Completed tests for CNNFinance
-...
-
-🎯 ===== INTEGRATION TEST SUMMARY =====
-⏱️  Total execution time: 23.45s
-📊 Total tests: 87
-✅ Successful: 82 (94.3%)
-❌ Failed: 5 (5.7%)
-📰 Total articles fetched: 1,247
-
-📈 === SOURCE BREAKDOWN ===
-🔸 CNBC: 12/13 passed (92.3%) - 156 articles - avg 1.2s
-🔸 CNNFinance: 9/9 passed (100.0%) - 203 articles - avg 0.8s
-...
-
-🎉 Overall Status: EXCELLENT (94.3% success rate)
-```
-
-### Failure Analysis
-```
-❌ Failed: 5 (5.7%)
-
-📈 === SOURCE BREAKDOWN ===
-🔸 MarketWatch: 8/12 passed (66.7%) - 89 articles - avg 2.1s
-   Failed functions: ["newsletter_and_research", "stocks_to_watch"]
-
-🔍 === DEPRECATION REPORT ===
-Deprecated endpoints detected:
-  - MarketWatch::newsletter_and_research (404 Not Found)
-  - NASDAQ::original_content (403 Forbidden)
-
-⚠️  Overall Status: NEEDS ATTENTION (66.7% success rate)
-```
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Network Timeouts**
-   ```bash
-   # Increase timeout for slow connections
-   INTEGRATION_TIMEOUT=60 cargo test --test integration_test_suite
-   ```
-
-2. **Rate Limiting**
-   ```bash
-   # Disable parallel execution
-   PARALLEL_EXECUTION=0 cargo test --test integration_test_suite
-   ```
-
-3. **CI Failures**
-   ```bash
-   # Skip network-dependent tests
-   SKIP_NETWORK_TESTS=1 cargo test --test integration_test_suite
-   ```
-
-4. **Debugging Specific Source**
-   ```bash
-   # Test single source with verbose output
-   INTEGRATION_SOURCES=CNBC VERBOSE_OUTPUT=1 cargo test --test integration_test_suite
-   ```
-
-### Expected Failure Rates
-
-| Environment | Expected Success Rate | Action Threshold |
-|-------------|----------------------|------------------|
-| Local | ≥ 60% | Investigate below 60% |
-| CI | ≥ 70% | Fail build below 70% |
-| Nightly | ≥ 50% | Generate deprecation report |
-
-### Performance Benchmarks
-
-| Source | Expected Avg Response | Warning Threshold | Critical Threshold |
-|--------|----------------------|-------------------|-------------------|
-| CNBC | < 2s | > 5s | > 10s |
-| CNNFinance | < 1.5s | > 4s | > 8s |
-| MarketWatch | < 2.5s | > 6s | > 12s |
-| NASDAQ | < 2s | > 5s | > 10s |
-| SeekingAlpha | < 3s | > 7s | > 15s |
-| WSJ | < 2s | > 5s | > 10s |
-| YahooFinance | < 1.5s | > 4s | > 8s |
-
-## Contributing
-
-When adding new tests:
-
-1. Follow the existing test structure
-2. Use the provided utilities and assertions
-3. Add appropriate error handling and timeouts
-4. Update this documentation for new features
-5. Test in all three environments (Local, CI, Nightly)
-
-### Adding a New Source Test
-
+### Basic Functionality Test
+Validates that the source is properly configured:
 ```rust
-async fn test_new_source(client: reqwest::Client) -> Vec<TestResult> {
-    let source = NewSource::new(client);
-    let mut results = Vec::new();
+#[tokio::test]
+async fn test_source_basic_functionality() {
+    let client = ClientFactory::create_test_client().expect("Failed to create test client");
+    let source = Source::new(client);
 
-    // Test basic functionality
-    results.push(Self::test_basic_functionality(&source, "NewSource").await);
-
-    // Test specific functions
-    results.extend(vec![
-        Self::test_function("function1", || source.function1()).await,
-        Self::test_function("function2", || source.function2()).await,
-    ]);
-
-    results
+    assert_eq!(source.name(), "Source Name");
+    
+    let topics = source.available_topics();
+    assert!(!topics.is_empty());
 }
 ```
 
-Then add the source to the test runner's `test_source_async` method.
+### Individual Topic Tests
+Tests each major topic/method:
+```rust
+#[tokio::test]
+async fn test_source_topic() {
+    let client = ClientFactory::create_test_client().expect("Failed to create test client");
+    let source = Source::new(client);
+
+    match source.topic().await {
+        Ok(articles) => {
+            println!("✓ topic returned {} articles", articles.len());
+            for article in &articles {
+                assert_eq!(article.source, Some("Source Name".to_string()));
+            }
+        }
+        Err(e) => println!("✗ topic failed: {}", e),
+    }
+}
+```
+
+### Comprehensive Topic Test
+Tests all available topics:
+```rust
+#[tokio::test]
+async fn test_source_all_topics() {
+    let client = ClientFactory::create_test_client().expect("Failed to create test client");
+    let source = Source::new(client);
+
+    let topics = source.available_topics();
+    let mut successful = 0;
+
+    for &topic in &topics {
+        match source.fetch_topic(topic).await {
+            Ok(articles) => {
+                successful += 1;
+                println!("✓ {} returned {} articles", topic, articles.len());
+            }
+            Err(e) => {
+                println!("✗ {} failed: {}", topic, e);
+            }
+        }
+    }
+
+    println!("\nSource Summary: {}/{} topics accessible", successful, topics.len());
+    assert!(successful > 0, "At least one feed should be accessible");
+}
+```
+
+## Test Results
+
+Current feed accessibility status:
+
+| Source | Topics | Accessible | Success Rate | Notes |
+|--------|--------|------------|--------------|-------|
+| **NASDAQ** | 10 | 10 | 100% | All feeds working |
+| **CNBC** | 24 | 24 | 100% | All feeds working |
+| **CNN Finance** | 11 | 8 | 73% | Some XML parsing issues |
+| **WSJ** | 6 | 6 | 100% | All feeds working |
+| **Yahoo Finance** | 2 | 2 | 100% | All feeds working |
+| **Seeking Alpha** | 12 | 12 | 100% | All feeds working |
+| **MarketWatch** | 13 | 4 | 31% | Many XML parsing issues |
+
+### Known Issues
+
+**CNN Finance:**
+- `money_news_investing` - XML parsing error
+- `money_real_estate` - XML parsing error
+- `morning_buzz` - XML parsing error
+
+**MarketWatch:**
+- Multiple feeds have XML entity reference issues
+- Only core feeds (top_stories, real_time_headlines, market_pulse, bulletins) are reliable
+
+## Running Tests
+
+### Run All Tests
+```bash
+cargo test --tests
+```
+
+### Run Specific Source
+```bash
+cargo test --test test_nasdaq_integration
+```
+
+### Run with Output
+```bash
+cargo test --test test_nasdaq_integration -- --nocapture
+```
+
+### Run Specific Test
+```bash
+cargo test --test test_nasdaq_integration test_nasdaq_technology
+```
+
+## Test Utilities
+
+### Client Factory
+Creates HTTP clients with appropriate timeouts and retry logic:
+```rust
+use integration::utils::client_factory::ClientFactory;
+
+let client = ClientFactory::create_test_client()
+    .expect("Failed to create test client");
+```
+
+### Environment Configuration
+Adapts test behavior based on environment:
+```rust
+use integration::utils::environment::EnvironmentConfig;
+
+let config = EnvironmentConfig::from_env();
+// Automatically detects CI, local, or nightly mode
+```
+
+### Deprecation Tracker
+Monitors endpoint failures for deprecation analysis:
+```rust
+use integration::utils::deprecation_tracker::DeprecationTracker;
+
+let mut tracker = DeprecationTracker::new();
+tracker.record_failure("Source", "function", &error);
+let report = tracker.generate_report();
+```
+
+## Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `CI` | Enable CI mode (shorter timeouts) | `false` |
+| `INTEGRATION_TIMEOUT` | Network timeout in seconds | `30` |
+| `INTEGRATION_RETRIES` | Max retry attempts | `3` |
+
+### Examples
+
+```bash
+# Run with longer timeout
+INTEGRATION_TIMEOUT=60 cargo test --tests
+
+# Run in CI mode
+CI=1 cargo test --tests
+
+# Run with more retries
+INTEGRATION_RETRIES=5 cargo test --tests
+```
+
+## Adding New Tests
+
+When adding tests for a new source:
+
+1. **Create a new test file** following the naming convention:
+   ```
+   tests/test_newsource_integration.rs
+   ```
+
+2. **Import required modules:**
+   ```rust
+   use finance_news_aggregator_rs::news_source::NewsSource;
+   use finance_news_aggregator_rs::news_source::newsource::NewSource;
+   use tokio;
+
+   mod integration;
+   use integration::utils::client_factory::ClientFactory;
+   ```
+
+3. **Add basic functionality test:**
+   ```rust
+   #[tokio::test]
+   async fn test_newsource_basic_functionality() {
+       let client = ClientFactory::create_test_client()
+           .expect("Failed to create test client");
+       let source = NewSource::new(client);
+
+       assert_eq!(source.name(), "New Source");
+       
+       let topics = source.available_topics();
+       assert!(!topics.is_empty());
+   }
+   ```
+
+4. **Add individual topic tests** for each major method
+
+5. **Add comprehensive test** that validates all topics
+
+6. **Update this README** with the new source information
+
+## Troubleshooting
+
+### Network Timeouts
+If tests are timing out:
+```bash
+INTEGRATION_TIMEOUT=60 cargo test --tests
+```
+
+### Rate Limiting
+If you're hitting rate limits, run tests sequentially:
+```bash
+cargo test --tests -- --test-threads=1
+```
+
+### Debugging Failures
+Run with output to see detailed error messages:
+```bash
+cargo test --test test_source_integration -- --nocapture
+```
+
+### CI Failures
+Tests may fail in CI due to network issues. This is expected and tests should be retried.
+
+## Contributing
+
+When contributing tests:
+
+1. **Keep tests simple** - Focus on feed accessibility
+2. **Don't validate content** - We only check if feeds work
+3. **Handle failures gracefully** - Print errors but don't panic
+4. **Use consistent patterns** - Follow existing test structure
+5. **Update documentation** - Keep this README current
+
+## Test Maintenance
+
+### Regular Checks
+- Monitor feed accessibility rates
+- Update tests when APIs change
+- Remove tests for deprecated endpoints
+- Add tests for new features
+
+### Deprecation Management
+When feeds consistently fail:
+1. Check if the RSS feed URL has changed
+2. Verify the feed still exists
+3. Update the source implementation if needed
+4. Remove the test if the feed is permanently gone
+
+### Performance
+Tests should complete in under 30 seconds total. If tests are slow:
+- Check network connectivity
+- Verify timeout settings
+- Consider reducing the number of topics tested
