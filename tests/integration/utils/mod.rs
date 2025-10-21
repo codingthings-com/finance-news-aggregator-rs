@@ -5,6 +5,7 @@ use reqwest::Client;
 pub mod assertions;
 pub mod client_factory;
 pub mod deprecation_tracker;
+pub mod environment;
 
 /// Configuration for integration tests
 #[derive(Debug, Clone)]

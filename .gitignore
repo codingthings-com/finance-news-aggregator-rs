@@ -19,3 +19,5 @@ Thumbs.db
 # Output files
 examples/responses/
 *.json
+
+# .kiro
