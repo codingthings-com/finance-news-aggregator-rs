@@ -1,5 +1,5 @@
-use finance_news_aggregator_rs::news_source::NewsSource;
 use finance_news_aggregator_rs::NewsClient;
+use finance_news_aggregator_rs::news_source::NewsSource;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -25,14 +25,26 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Display first article from each
     if let Some(article) = articles.first() {
         println!("First WSJ article:");
-        println!("  Title: {}", article.title.as_ref().unwrap_or(&"N/A".to_string()));
-        println!("  Link: {}", article.link.as_ref().unwrap_or(&"N/A".to_string()));
+        println!(
+            "  Title: {}",
+            article.title.as_ref().unwrap_or(&"N/A".to_string())
+        );
+        println!(
+            "  Link: {}",
+            article.link.as_ref().unwrap_or(&"N/A".to_string())
+        );
     }
 
     if let Some(article) = cnbc_articles.first() {
         println!("\nFirst CNBC article:");
-        println!("  Title: {}", article.title.as_ref().unwrap_or(&"N/A".to_string()));
-        println!("  Link: {}", article.link.as_ref().unwrap_or(&"N/A".to_string()));
+        println!(
+            "  Title: {}",
+            article.title.as_ref().unwrap_or(&"N/A".to_string())
+        );
+        println!(
+            "  Link: {}",
+            article.link.as_ref().unwrap_or(&"N/A".to_string())
+        );
     }
 
     Ok(())
