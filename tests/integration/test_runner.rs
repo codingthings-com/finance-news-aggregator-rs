@@ -227,8 +227,8 @@ impl IntegrationTestRunner {
         let topics = vec!["economy", "finance", "politics", "health_care"];
         for topic in topics {
             results.push(Self::test_function(
-                &format!("news_feed({})", topic),
-                || cnbc.news_feed(topic)
+                &format!("fetch_topic({})", topic),
+                || cnbc.fetch_topic(topic)
             ).await);
         }
 
@@ -303,8 +303,8 @@ impl IntegrationTestRunner {
         let categories = vec!["commodities", "cryptocurrency", "earnings"];
         for category in categories {
             results.push(Self::test_function(
-                &format!("feed_by_category({})", category),
-                || nasdaq.feed_by_category(category)
+                &format!("fetch_topic({})", category),
+                || nasdaq.fetch_topic(category)
             ).await);
         }
 
@@ -455,16 +455,6 @@ impl IntegrationTestRunner {
             return TestResult::failure(
                 &format!("{}_basic", source_name),
                 "name() returned empty string".to_string(),
-                start_time.elapsed(),
-            );
-        }
-
-        // Test base_url() function
-        let base_url = source.base_url();
-        if base_url.is_empty() {
-            return TestResult::failure(
-                &format!("{}_basic", source_name),
-                "base_url() returned empty string".to_string(),
                 start_time.elapsed(),
             );
         }

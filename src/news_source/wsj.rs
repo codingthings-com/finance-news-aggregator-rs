@@ -3,32 +3,38 @@ use crate::news_source::NewsSource;
 use crate::parser::NewsParser;
 use crate::types::{NewsArticle, SourceConfig};
 use async_trait::async_trait;
-use log::debug;
 use reqwest::Client;
+use std::collections::HashMap;
 
 /// Wall Street Journal news client
+/// 
+/// Provides access to Wall Street Journal RSS feeds including opinions, world news,
+/// business, markets, technology, and lifestyle content.
 pub struct WallStreetJournal {
-    config: SourceConfig,
+    url_map: HashMap<String, String>,
     client: Client,
     parser: NewsParser,
 }
 
 impl WallStreetJournal {
     /// Create a new Wall Street Journal client
+    /// 
+    /// Initializes the client with WSJ RSS feed URL patterns.
     pub fn new(client: Client) -> Self {
-        let config = SourceConfig::new("https://feeds.a.dj.com/rss/{topic}.xml");
-
-        Self {
-            config,
-            client,
-            parser: NewsParser::new("wsj"),
-        }
+        Self::with_config(client, SourceConfig::new("https://feeds.a.dj.com/rss/{topic}.xml"))
     }
 
     /// Create a new Wall Street Journal client with custom config
+    /// 
+    /// # Arguments
+    /// * `client` - HTTP client for making requests
+    /// * `config` - Source configuration (only base_url is used)
     pub fn with_config(client: Client, config: SourceConfig) -> Self {
+        let mut url_map = HashMap::new();
+        url_map.insert("base".to_string(), config.base_url.clone());
+
         Self {
-            config,
+            url_map,
             client,
             parser: NewsParser::new("wsj"),
         }
@@ -36,32 +42,32 @@ impl WallStreetJournal {
 
     /// Get opinions feed
     pub async fn opinions(&self) -> Result<Vec<NewsArticle>> {
-        self.fetch_feed("RSSOpinion").await
+        self.fetch_topic("RSSOpinion").await
     }
 
     /// Get world news feed
     pub async fn world_news(&self) -> Result<Vec<NewsArticle>> {
-        self.fetch_feed("RSSWorldNews").await
+        self.fetch_topic("RSSWorldNews").await
     }
 
     /// Get US business news feed
     pub async fn us_business_news(&self) -> Result<Vec<NewsArticle>> {
-        self.fetch_feed("WSJcomUSBusiness").await
+        self.fetch_topic("WSJcomUSBusiness").await
     }
 
     /// Get market news feed
     pub async fn market_news(&self) -> Result<Vec<NewsArticle>> {
-        self.fetch_feed("RSSMarketsMain").await
+        self.fetch_topic("RSSMarketsMain").await
     }
 
     /// Get technology news feed
     pub async fn technology_news(&self) -> Result<Vec<NewsArticle>> {
-        self.fetch_feed("RSSWSJD").await
+        self.fetch_topic("RSSWSJD").await
     }
 
     /// Get lifestyle feed
     pub async fn lifestyle(&self) -> Result<Vec<NewsArticle>> {
-        self.fetch_feed("RSSLifestyle").await
+        self.fetch_topic("RSSLifestyle").await
     }
 }
 
@@ -71,29 +77,19 @@ impl NewsSource for WallStreetJournal {
         "Wall Street Journal"
     }
 
-    fn base_url(&self) -> &str {
-        &self.config.base_url
+    fn url_map(&self) -> &HashMap<String, String> {
+        &self.url_map
     }
 
-    async fn fetch_feed(&self, topic: &str) -> Result<Vec<NewsArticle>> {
-        let url = self.config.base_url.replace("{topic}", topic);
-        debug!("Fetching WSJ feed: {}", url);
-
-        let response = self.client.get(&url).send().await?;
-        let content = response.text().await?;
-
-        debug!("Received {} bytes of content", content.len());
-
-        let mut articles = self.parser.parse_response(&content)?;
-
-        // Set source for all articles
-        for article in &mut articles {
-            article.source = Some(self.name().to_string());
-        }
-
-        debug!("Parsed {} articles from WSJ {}", articles.len(), topic);
-        Ok(articles)
+    fn client(&self) -> &Client {
+        &self.client
     }
+
+    fn parser(&self) -> &NewsParser {
+        &self.parser
+    }
+
+    // Uses default fetch_topic implementation (simple pattern substitution)
 
     fn available_topics(&self) -> Vec<&'static str> {
         vec![

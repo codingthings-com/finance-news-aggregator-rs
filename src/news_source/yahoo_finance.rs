@@ -3,100 +3,61 @@ use crate::news_source::NewsSource;
 use crate::parser::NewsParser;
 use crate::types::NewsArticle;
 use async_trait::async_trait;
-use log::debug;
 use reqwest::Client;
+use std::collections::HashMap;
 
 /// Yahoo Finance news client
+/// 
+/// Provides access to Yahoo Finance RSS feeds for financial news and market updates.
 pub struct YahooFinance {
-    base_url: String,
+    url_map: HashMap<String, String>,
     client: Client,
     parser: NewsParser,
 }
 
 impl YahooFinance {
     /// Create a new Yahoo Finance client
+    /// 
+    /// Initializes the client with Yahoo Finance RSS feed URLs.
+    /// Note: The old feeds.finance.yahoo.com/rss/2.0 endpoint is no longer available.
     pub fn new(client: Client) -> Self {
+        let mut url_map = HashMap::new();
+        url_map.insert("base".to_string(), "https://finance.yahoo.com/news/rssindex".to_string());
+        
         Self {
-            base_url: "https://finance.yahoo.com/news/rssindex".to_string(),
+            url_map,
             client,
             parser: NewsParser::new("yahoo"),
         }
-        // https://feeds.finance.yahoo.com/rss/2.0 no longer available
     }
 
-    /// Get general news feed
+    /// Get general news headlines
     pub async fn headlines(&self) -> Result<Vec<NewsArticle>> {
-        let url = format!("{}/headlines", self.base_url);
-        debug!("Fetching Yahoo Finance Headlines: {}", url);
-
-        let response = self.client.get(&url).send().await?;
-        let content = response.text().await?;
-
-        debug!("Received {} bytes of content", content.len());
-
-        let mut articles = self.parser.parse_response(&content)?;
-
-        // Set source for all articles
-        for article in &mut articles {
-            article.source = Some(self.name().to_string());
-        }
-
-        debug!("Parsed {} articles from Yahoo Finance news", articles.len());
-        Ok(articles)
+        self.fetch_topic("headlines").await
     }
 
-    /// Get headlines for specific symbols
+    /// Get headlines for specific stock symbols
+    /// 
+    /// # Arguments
+    /// * `symbols` - Array of stock symbols (e.g., ["AAPL", "GOOGL", "MSFT"])
+    /// 
+    /// # Returns
+    /// News articles related to the specified symbols
     pub async fn headline(&self, symbols: &[&str]) -> Result<Vec<NewsArticle>> {
+        let base_url = self.url_map
+            .get("base")
+            .ok_or_else(|| crate::error::FanError::InvalidUrl("Base URL not found".to_string()))?;
+        
         let symbols_str = symbols.join(",");
-        let url = format!("{}/headline?s={}", self.base_url, symbols_str);
-        debug!(
-            "Fetching Yahoo Finance headlines for symbols: {}",
-            symbols_str
-        );
-
-        let response = self.client.get(&url).send().await?;
-        let content = response.text().await?;
-
-        debug!("Received {} bytes of content", content.len());
-
-        let mut articles = self.parser.parse_response(&content)?;
-
-        // Set source for all articles
-        for article in &mut articles {
-            article.source = Some(self.name().to_string());
-        }
-
-        debug!(
-            "Parsed {} articles from Yahoo Finance headlines",
-            articles.len()
-        );
-        Ok(articles)
+        let url = format!("{}/headline?s={}", base_url, symbols_str);
+        
+        self.fetch_feed_by_url(&url).await
     }
 
-    /// Get market summary
+    /// Get top stories and market summary
     pub async fn topstories(&self) -> Result<Vec<NewsArticle>> {
-        let url = format!("{}/topstories", self.base_url);
-        debug!("Fetching Yahoo Finance market summary: {}", url);
-
-        let response = self.client.get(&url).send().await?;
-        let content = response.text().await?;
-
-        debug!("Received {} bytes of content", content.len());
-
-        let mut articles = self.parser.parse_response(&content)?;
-
-        // Set source for all articles
-        for article in &mut articles {
-            article.source = Some(self.name().to_string());
-        }
-
-        debug!(
-            "Parsed {} articles from Yahoo Finance market summary",
-            articles.len()
-        );
-        Ok(articles)
+        self.fetch_topic("topstories").await
     }
-
 }
 
 #[async_trait]
@@ -105,39 +66,28 @@ impl NewsSource for YahooFinance {
         "Yahoo Finance"
     }
 
-    fn base_url(&self) -> &str {
-        &self.base_url
+    fn url_map(&self) -> &HashMap<String, String> {
+        &self.url_map
     }
 
-    async fn fetch_feed(&self, category: &str) -> Result<Vec<NewsArticle>> {
-        match category {
-            "headlines" => self.headlines().await,
-            "topstories" => self.topstories().await,
-            _ => {
-                let url = format!("{}/{}", self.base_url, category);
-                debug!("Fetching Yahoo Finance feed: {}", url);
-
-                let response = self.client.get(&url).send().await?;
-                let content = response.text().await?;
-
-                debug!("Received {} bytes of content", content.len());
-
-                let mut articles = self.parser.parse_response(&content)?;
-
-                // Set source for all articles
-                for article in &mut articles {
-                    article.source = Some(self.name().to_string());
-                }
-
-                debug!(
-                    "Parsed {} articles from Yahoo Finance {}",
-                    articles.len(),
-                    category
-                );
-                Ok(articles)
-            }
-        }
+    fn client(&self) -> &Client {
+        &self.client
     }
+
+    fn parser(&self) -> &NewsParser {
+        &self.parser
+    }
+
+    // Override build_topic_url for Yahoo's URL structure (base/{topic} instead of pattern substitution)
+    fn build_topic_url(&self, topic: &str) -> Result<String> {
+        let base_url = self.url_map()
+            .get("base")
+            .ok_or_else(|| crate::error::FanError::InvalidUrl("Base URL not found".to_string()))?;
+        
+        Ok(format!("{}/{}", base_url, topic))
+    }
+
+    // Uses default fetch_topic implementation
 
     fn available_topics(&self) -> Vec<&'static str> {
         vec!["topstories", "headlines"]

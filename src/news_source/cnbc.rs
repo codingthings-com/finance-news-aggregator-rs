@@ -3,13 +3,15 @@ use crate::news_source::NewsSource;
 use crate::parser::NewsParser;
 use crate::types::{NewsArticle, SourceConfig};
 use async_trait::async_trait;
-use log::debug;
 use reqwest::Client;
 use std::collections::HashMap;
 
 /// CNBC news client
+/// 
+/// Provides access to CNBC RSS feeds covering business news, markets, technology,
+/// politics, healthcare, and more across global markets.
 pub struct CNBC {
-    config: SourceConfig,
+    url_map: HashMap<String, String>,
     client: Client,
     parser: NewsParser,
     topic_categories: HashMap<&'static str, u32>,
@@ -17,15 +19,22 @@ pub struct CNBC {
 
 impl CNBC {
     /// Create a new CNBC client
+    /// 
+    /// Initializes the client with CNBC RSS feed URL patterns and topic ID mappings.
     pub fn new(client: Client) -> Self {
-        let config = SourceConfig::new("https://www.cnbc.com/id/{topic_id}/device/rss/rss.html");
-        Self::with_config(client, config)
+        Self::with_config(client, SourceConfig::new("https://www.cnbc.com/id/{topic_id}/device/rss/rss.html"))
     }
 
     /// Create a new CNBC client with custom config
+    /// 
+    /// # Arguments
+    /// * `client` - HTTP client for making requests
+    /// * `config` - Source configuration (only base_url is used)
     pub fn with_config(client: Client, config: SourceConfig) -> Self {
+        let mut url_map = HashMap::new();
+        url_map.insert("base".to_string(), config.base_url.clone());
+        
         let mut topic_categories = HashMap::new();
-
         // RSS feed IDs for CNBC topics
         topic_categories.insert("top_news", 100003114);
         topic_categories.insert("world_news", 100727362);
@@ -53,48 +62,36 @@ impl CNBC {
         topic_categories.insert("personal_finance", 21324812);
 
         Self {
-            config,
+            url_map,
             client,
             parser: NewsParser::new("cnbc"),
             topic_categories,
         }
     }
 
-    /// Get news feed by topic
-    pub async fn news_feed(&self, topic: &str) -> Result<Vec<NewsArticle>> {
-        if let Some(&topic_id) = self.topic_categories.get(topic) {
-            self.fetch_feed(&topic_id.to_string()).await
-        } else {
-            Err(crate::error::FanError::InvalidUrl(format!(
-                "Invalid topic: {}",
-                topic
-            )))
-        }
-    }
-
     /// Get top news
     pub async fn top_news(&self) -> Result<Vec<NewsArticle>> {
-        self.news_feed("top_news").await
+        self.fetch_topic("top_news").await
     }
 
     /// Get world news
     pub async fn world_news(&self) -> Result<Vec<NewsArticle>> {
-        self.news_feed("world_news").await
+        self.fetch_topic("world_news").await
     }
 
     /// Get business news
     pub async fn business(&self) -> Result<Vec<NewsArticle>> {
-        self.news_feed("business").await
+        self.fetch_topic("business").await
     }
 
     /// Get technology news
     pub async fn technology(&self) -> Result<Vec<NewsArticle>> {
-        self.news_feed("technology").await
+        self.fetch_topic("technology").await
     }
 
     /// Get investing news
     pub async fn investing(&self) -> Result<Vec<NewsArticle>> {
-        self.news_feed("investing").await
+        self.fetch_topic("investing").await
     }
 }
 
@@ -104,33 +101,32 @@ impl NewsSource for CNBC {
         "CNBC"
     }
 
-    fn base_url(&self) -> &str {
-        &self.config.base_url
+    fn url_map(&self) -> &HashMap<String, String> {
+        &self.url_map
     }
 
-    async fn fetch_feed(&self, topic_id: &str) -> Result<Vec<NewsArticle>> {
-        let url = self.config.base_url.replace("{topic_id}", topic_id);
-        debug!("Fetching CNBC feed: {}", url);
-
-        let response = self.client.get(&url).send().await?;
-        let content = response.text().await?;
-
-        debug!("Received {} bytes of content", content.len());
-
-        let mut articles = self.parser.parse_response(&content)?;
-
-        // Set source for all articles
-        for article in &mut articles {
-            article.source = Some(self.name().to_string());
-        }
-
-        debug!(
-            "Parsed {} articles from CNBC topic {}",
-            articles.len(),
-            topic_id
-        );
-        Ok(articles)
+    fn client(&self) -> &Client {
+        &self.client
     }
+
+    fn parser(&self) -> &NewsParser {
+        &self.parser
+    }
+
+    // Override build_topic_url to map topic names to numeric IDs
+    fn build_topic_url(&self, topic: &str) -> Result<String> {
+        let topic_id = self.topic_categories
+            .get(topic)
+            .ok_or_else(|| crate::error::FanError::InvalidUrl(format!("Invalid topic: {}", topic)))?;
+        
+        let base_url = self.url_map()
+            .get("base")
+            .ok_or_else(|| crate::error::FanError::InvalidUrl("Base URL not found".to_string()))?;
+        
+        Ok(base_url.replace("{topic_id}", &topic_id.to_string()))
+    }
+
+    // Uses default fetch_topic implementation
 
     fn available_topics(&self) -> Vec<&'static str> {
         self.topic_categories.keys().copied().collect()

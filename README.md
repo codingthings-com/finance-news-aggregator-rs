@@ -38,6 +38,7 @@ finance-news-aggregator-rs = { git = "https://github.com/codingthings-com/financ
 ```rust
 use finance_news_aggregator_rs::{NewsClient, Result};
 use finance_news_aggregator_rs::types::SourceConfig;
+use finance_news_aggregator_rs::news_source::NewsSource;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -51,7 +52,7 @@ async fn main() -> Result<()> {
         .with_retries(5, 2000);
     let mut custom_client = NewsClient::with_config(config);
     
-    // Get WSJ client
+    // Get WSJ client and use convenience methods
     let wsj = client.wsj();
     let opinions = wsj.opinions().await?;
     println!("Found {} WSJ opinion articles", opinions.len());
@@ -61,12 +62,36 @@ async fn main() -> Result<()> {
     let top_news = cnbc.top_news().await?;
     println!("Found {} CNBC top news articles", top_news.len());
     
+    // Use the generic topic-based API
+    // First, get available topics
+    let topics = cnbc.available_topics();
+    println!("Available CNBC topics: {:?}", topics);
+    
+    // Then fetch by topic name
+    let tech_news = cnbc.fetch_topic("technology").await?;
+    println!("Found {} technology articles", tech_news.len());
+    
+    // Or fetch from any RSS URL directly
+    let custom_url = "https://feeds.a.dj.com/rss/RSSOpinion.xml";
+    let articles = wsj.fetch_feed_by_url(custom_url).await?;
+    println!("Found {} articles from custom URL", articles.len());
+    
     // Save to file
     client.save_to_file(&opinions, "wsj_opinions").await?;
     
     Ok(())
 }
 ```
+
+### New Architecture Features
+
+The library now provides three ways to fetch news:
+
+1. **Convenience Methods**: Source-specific methods like `wsj.opinions()`, `cnbc.top_news()`
+2. **Topic-Based Fetching**: Generic `fetch_topic(topic)` method that works across all sources
+3. **Direct URL Fetching**: Generic `fetch_feed_by_url(url)` for fetching any RSS feed
+
+Each news source maintains a URL map with named endpoints, making it easy to extend and customize feed sources.
 
 See src/news_source/*.rs for the available feeds for each source.
 
@@ -78,6 +103,12 @@ Run the examples:
 ```bash
 # All sources example
 cargo run --example all_sources_example
+
+# Topic-based API example (demonstrates new features)
+cargo run --example topic_based_example
+
+# Configuration example
+cargo run --example config_example
 ```
 
 ## Development
@@ -186,23 +217,76 @@ The project includes a comprehensive integration testing framework with:
 - **Article Validation Rules**: Flexible validation rules for different data quality requirements
 - **Client Factory**: Standardized HTTP client creation for consistent testing
 
+## Architecture
+
+### NewsSource Trait
+
+All news sources implement the `NewsSource` trait, which provides:
+
+- `name()` - Returns the source name
+- `url_map()` - Returns a HashMap of named URLs (e.g., "base", "buzz", "original")
+- `client()` - Returns the HTTP client
+- `parser()` - Returns the RSS parser
+- `fetch_feed_by_url(url)` - Generic method to fetch any RSS feed (default implementation)
+- `fetch_topic(topic)` - Fetch news by topic name (source-specific implementation)
+- `available_topics()` - List all available topics for the source
+
+### URL Mapping
+
+Each news source maintains a `HashMap<String, String>` for URL management:
+
+```rust
+// Example: CNN Finance URL map
+{
+    "base": "http://rss.cnn.com/rss/{topic}.rss",
+    "buzz": "http://rss.cnn.com/cnnmoneymorningbuzz"
+}
+```
+
+This design allows:
+- Multiple URL patterns per source
+- Easy addition of new endpoints
+- Clear separation between URL templates and topic logic
+
+### Topic-Based Fetching
+
+The `fetch_topic()` method maps friendly topic names to actual feed URLs:
+
+```rust
+// Client code
+let articles = cnn.fetch_topic("money_latest").await?;
+
+// Internally maps to:
+// http://rss.cnn.com/rss/money_latest.rss
+```
+
+Each source implements its own topic-to-URL mapping logic, handling:
+- URL template substitution
+- Query parameter construction
+- Special case endpoints (e.g., "morning_buzz" for CNN)
+
 ## Project Structure
 
 ```
 finance-news-aggregator-rs/
 ├── src/
-│   ├── lib.rs          # Library root
+│   ├── lib.rs               # Library root
 │   ├── news_client.rs       # Main news client
-│   ├── error.rs        # Error types
-│   ├── parser.rs       # RSS/XML parser
-│   ├── types.rs        # Common types
-│   └── news_source/        # News source implementations
-│       ├── mod.rs
-│       └── wsj.rs      # Wall Street Journal
-│       └── ...         # ... others
+│   ├── error.rs             # Error types
+│   ├── parser.rs            # RSS/XML parser
+│   ├── types.rs             # Common types
+│   └── news_source/         # News source implementations
+│       ├── mod.rs           # NewsSource trait with default implementations
+│       ├── wsj.rs           # Wall Street Journal
+│       ├── cnbc.rs          # CNBC
+│       ├── cnn_finance.rs   # CNN Finance
+│       ├── yahoo_finance.rs # Yahoo Finance
+│       ├── nasdaq.rs        # NASDAQ
+│       ├── market_watch.rs  # MarketWatch
+│       └── seeking_alpha.rs # Seeking Alpha
 ├── examples/
-│   └── all_sources_example.rs  # Usage examples
-│   └── config_example.rs  # Usage examples
+│   ├── all_sources_example.rs  # Usage examples
+│   └── config_example.rs       # Configuration examples
 └── Cargo.toml
 ```
 
@@ -232,6 +316,10 @@ export RUST_LOG=debug
 
 - **Async/Await Support**: Built with Tokio for efficient async operations
 - **Modular Design**: Easy to extend with new news sources
+- **Flexible Fetching**: Three ways to fetch news - convenience methods, topic-based, or direct URL
+- **URL Mapping**: Each source maintains a HashMap of named URLs for easy customization
+- **Generic Feed Fetcher**: Common `fetch_feed_by_url()` implementation shared across all sources
+- **Topic Discovery**: `available_topics()` method to discover supported feeds for each source
 - **Error Handling**: Comprehensive error types with `thiserror`
 - **Robust XML Parsing**: Handles various RSS/XML formats with namespace support
 - **UTF-8 Safety**: Graceful handling of invalid UTF-8 sequences in feeds

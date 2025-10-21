@@ -3,23 +3,30 @@ use crate::news_source::NewsSource;
 use crate::parser::NewsParser;
 use crate::types::NewsArticle;
 use async_trait::async_trait;
-use log::debug;
 use reqwest::Client;
+use std::collections::HashMap;
 
 /// NASDAQ news client
+/// 
+/// Provides access to NASDAQ RSS feeds covering stocks, commodities, cryptocurrency,
+/// earnings, economics, and technology news.
 pub struct NASDAQ {
-    base_url: String,
-    original_content_url: String,
+    url_map: HashMap<String, String>,
     client: Client,
     parser: NewsParser,
 }
 
 impl NASDAQ {
     /// Create a new NASDAQ client
+    /// 
+    /// Initializes the client with NASDAQ RSS feed URLs.
     pub fn new(client: Client) -> Self {
+        let mut url_map = HashMap::new();
+        url_map.insert("base".to_string(), "https://www.nasdaq.com/feed/rssoutbound".to_string());
+        url_map.insert("original".to_string(), "https://www.nasdaq.com/feed/nasdaq-original/rss.xml".to_string());
+        
         Self {
-            base_url: "https://www.nasdaq.com/feed/rssoutbound".to_string(),
-            original_content_url: "https://www.nasdaq.com/feed/nasdaq-original/rss.xml".to_string(),
+            url_map,
             client,
             parser: NewsParser::new("nasdaq"),
         }
@@ -27,96 +34,52 @@ impl NASDAQ {
 
     /// Get original content feed
     pub async fn original_content(&self) -> Result<Vec<NewsArticle>> {
-        let url = &self.original_content_url;
-        debug!("Fetching NASDAQ original content: {}", url);
-
-        let response = self.client.get(url).send().await?;
-        let content = response.text().await?;
-
-        debug!("Received {} bytes of content", content.len());
-
-        let mut articles = self.parser.parse_response(&content)?;
-
-        // Set source for all articles
-        for article in &mut articles {
-            article.source = Some(self.name().to_string());
-        }
-
-        debug!(
-            "Parsed {} articles from NASDAQ original content",
-            articles.len()
-        );
-        Ok(articles)
-    }
-
-    /// Get feed by category
-    pub async fn feed_by_category(&self, category: &str) -> Result<Vec<NewsArticle>> {
-        let url = format!("{}?category={}", self.base_url, category);
-        debug!("Fetching NASDAQ feed: {}", url);
-
-        let response = self.client.get(&url).send().await?;
-        let content = response.text().await?;
-
-        debug!("Received {} bytes of content", content.len());
-
-        let mut articles = self.parser.parse_response(&content)?;
-
-        // Set source for all articles
-        for article in &mut articles {
-            article.source = Some(self.name().to_string());
-        }
-
-        debug!(
-            "Parsed {} articles from NASDAQ category {}",
-            articles.len(),
-            category
-        );
-        Ok(articles)
+        self.fetch_topic("original").await
     }
 
     /// Get commodities feed
     pub async fn commodities(&self) -> Result<Vec<NewsArticle>> {
-        self.feed_by_category("commodities").await
+        self.fetch_topic("commodities").await
     }
 
     /// Get cryptocurrency feed
     pub async fn cryptocurrency(&self) -> Result<Vec<NewsArticle>> {
-        self.feed_by_category("cryptocurrency").await
+        self.fetch_topic("cryptocurrency").await
     }
 
     /// Get dividends feed
     pub async fn dividends(&self) -> Result<Vec<NewsArticle>> {
-        self.feed_by_category("dividends").await
+        self.fetch_topic("dividends").await
     }
 
     /// Get earnings feed
     pub async fn earnings(&self) -> Result<Vec<NewsArticle>> {
-        self.feed_by_category("earnings").await
+        self.fetch_topic("earnings").await
     }
 
     /// Get economics feed
     pub async fn economics(&self) -> Result<Vec<NewsArticle>> {
-        self.feed_by_category("economics").await
+        self.fetch_topic("economics").await
     }
 
     /// Get financial advisors feed
     pub async fn financial_advisors(&self) -> Result<Vec<NewsArticle>> {
-        self.feed_by_category("financial-advisors").await
+        self.fetch_topic("financial-advisors").await
     }
 
     /// Get innovation feed
     pub async fn innovation(&self) -> Result<Vec<NewsArticle>> {
-        self.feed_by_category("innovation").await
+        self.fetch_topic("innovation").await
     }
 
     /// Get stocks feed
     pub async fn stocks(&self) -> Result<Vec<NewsArticle>> {
-        self.feed_by_category("stocks").await
+        self.fetch_topic("stocks").await
     }
 
     /// Get technology feed
     pub async fn technology(&self) -> Result<Vec<NewsArticle>> {
-        self.feed_by_category("technology").await
+        self.fetch_topic("technology").await
     }
 }
 
@@ -126,17 +89,36 @@ impl NewsSource for NASDAQ {
         "NASDAQ"
     }
 
-    fn base_url(&self) -> &str {
-        &self.base_url
+    fn url_map(&self) -> &HashMap<String, String> {
+        &self.url_map
     }
 
-    async fn fetch_feed(&self, category: &str) -> Result<Vec<NewsArticle>> {
-        if category == "original" {
-            self.original_content().await
+    fn client(&self) -> &Client {
+        &self.client
+    }
+
+    fn parser(&self) -> &NewsParser {
+        &self.parser
+    }
+
+    // Override build_topic_url to handle special "original" endpoint and query parameters
+    fn build_topic_url(&self, topic: &str) -> Result<String> {
+        if topic == "original" {
+            // Special case: original content has its own dedicated URL
+            self.url_map()
+                .get("original")
+                .ok_or_else(|| crate::error::FanError::InvalidUrl("Original URL not found".to_string()))
+                .map(|s| s.clone())
         } else {
-            self.feed_by_category(category).await
+            // Standard topics use the base URL with category parameter
+            let base_url = self.url_map()
+                .get("base")
+                .ok_or_else(|| crate::error::FanError::InvalidUrl("Base URL not found".to_string()))?;
+            Ok(format!("{}?category={}", base_url, topic))
         }
     }
+
+    // Uses default fetch_topic implementation
 
     fn available_topics(&self) -> Vec<&'static str> {
         vec![
