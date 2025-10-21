@@ -7,7 +7,7 @@ use reqwest::Client;
 use std::collections::HashMap;
 
 /// CNBC news client
-/// 
+///
 /// Provides access to CNBC RSS feeds covering business news, markets, technology,
 /// politics, healthcare, and more across global markets.
 pub struct CNBC {
@@ -19,21 +19,24 @@ pub struct CNBC {
 
 impl CNBC {
     /// Create a new CNBC client
-    /// 
+    ///
     /// Initializes the client with CNBC RSS feed URL patterns and topic ID mappings.
     pub fn new(client: Client) -> Self {
-        Self::with_config(client, SourceConfig::new("https://www.cnbc.com/id/{topic_id}/device/rss/rss.html"))
+        Self::with_config(
+            client,
+            SourceConfig::new("https://www.cnbc.com/id/{topic_id}/device/rss/rss.html"),
+        )
     }
 
     /// Create a new CNBC client with custom config
-    /// 
+    ///
     /// # Arguments
     /// * `client` - HTTP client for making requests
     /// * `config` - Source configuration (only base_url is used)
     pub fn with_config(client: Client, config: SourceConfig) -> Self {
         let mut url_map = HashMap::new();
         url_map.insert("base".to_string(), config.base_url.clone());
-        
+
         let mut topic_categories = HashMap::new();
         // RSS feed IDs for CNBC topics
         topic_categories.insert("top_news", 100003114);
@@ -115,14 +118,15 @@ impl NewsSource for CNBC {
 
     // Override build_topic_url to map topic names to numeric IDs
     fn build_topic_url(&self, topic: &str) -> Result<String> {
-        let topic_id = self.topic_categories
-            .get(topic)
-            .ok_or_else(|| crate::error::FanError::InvalidUrl(format!("Invalid topic: {}", topic)))?;
-        
-        let base_url = self.url_map()
+        let topic_id = self.topic_categories.get(topic).ok_or_else(|| {
+            crate::error::FanError::InvalidUrl(format!("Invalid topic: {}", topic))
+        })?;
+
+        let base_url = self
+            .url_map()
             .get("base")
             .ok_or_else(|| crate::error::FanError::InvalidUrl("Base URL not found".to_string()))?;
-        
+
         Ok(base_url.replace("{topic_id}", &topic_id.to_string()))
     }
 

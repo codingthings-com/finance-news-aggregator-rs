@@ -1,6 +1,6 @@
+use reqwest::Client;
 use std::collections::HashMap;
 use std::time::{Duration, Instant};
-use reqwest::Client;
 
 pub mod assertions;
 pub mod client_factory;

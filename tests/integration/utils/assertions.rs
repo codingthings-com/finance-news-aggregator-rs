@@ -9,7 +9,10 @@ pub fn assert_valid_news_article(article: &NewsArticle, require_all_fields: bool
     if require_all_fields {
         assert!(article.title.is_some(), "Article title should not be None");
         assert!(article.link.is_some(), "Article link should not be None");
-        assert!(article.description.is_some(), "Article description should not be None");
+        assert!(
+            article.description.is_some(),
+            "Article description should not be None"
+        );
     } else {
         // At minimum, we expect either title or description to be present
         assert!(
@@ -20,7 +23,10 @@ pub fn assert_valid_news_article(article: &NewsArticle, require_all_fields: bool
 
     // If title exists, it should not be empty
     if let Some(ref title) = article.title {
-        assert!(!title.trim().is_empty(), "Article title should not be empty");
+        assert!(
+            !title.trim().is_empty(),
+            "Article title should not be empty"
+        );
     }
 
     // If link exists, it should be a valid URL
@@ -31,19 +37,25 @@ pub fn assert_valid_news_article(article: &NewsArticle, require_all_fields: bool
 
     // If description exists, it should not be empty
     if let Some(ref description) = article.description {
-        assert!(!description.trim().is_empty(), "Article description should not be empty");
+        assert!(
+            !description.trim().is_empty(),
+            "Article description should not be empty"
+        );
     }
 
     // If pub_date exists, it should not be empty
     if let Some(ref pub_date) = article.pub_date {
-        assert!(!pub_date.trim().is_empty(), "Article pub_date should not be empty");
+        assert!(
+            !pub_date.trim().is_empty(),
+            "Article pub_date should not be empty"
+        );
     }
 }
 
 /// Assert that a URL string is valid and properly formatted
 pub fn assert_valid_url(url_str: &str) {
     assert!(!url_str.trim().is_empty(), "URL should not be empty");
-    
+
     match Url::parse(url_str) {
         Ok(url) => {
             assert!(
@@ -80,8 +92,14 @@ pub fn assert_valid_news_collection(articles: &[NewsArticle], min_count: usize) 
     let valid_articles = articles
         .iter()
         .filter(|article| {
-            article.title.as_ref().map_or(false, |t| !t.trim().is_empty())
-                || article.description.as_ref().map_or(false, |d| !d.trim().is_empty())
+            article
+                .title
+                .as_ref()
+                .map_or(false, |t| !t.trim().is_empty())
+                || article
+                    .description
+                    .as_ref()
+                    .map_or(false, |d| !d.trim().is_empty())
         })
         .count();
 
@@ -108,7 +126,7 @@ pub fn assert_contains_expected_values(
     collection_name: &str,
 ) {
     assert_non_empty_collection(collection, collection_name);
-    
+
     for expected in expected_values {
         assert!(
             collection.iter().any(|item| item.contains(expected)),
@@ -120,11 +138,7 @@ pub fn assert_contains_expected_values(
 }
 
 /// Assert that a HashMap contains expected keys
-pub fn assert_contains_keys<V>(
-    map: &HashMap<String, V>,
-    expected_keys: &[&str],
-    map_name: &str,
-) {
+pub fn assert_contains_keys<V>(map: &HashMap<String, V>, expected_keys: &[&str], map_name: &str) {
     for key in expected_keys {
         assert!(
             map.contains_key(*key),
@@ -209,7 +223,10 @@ pub fn assert_article_meets_rules(article: &NewsArticle, rules: &ArticleValidati
     }
 
     if rules.require_description {
-        assert!(article.description.is_some(), "Article description is required");
+        assert!(
+            article.description.is_some(),
+            "Article description is required"
+        );
         let description = article.description.as_ref().unwrap();
         assert!(
             description.len() >= rules.minimum_description_length,

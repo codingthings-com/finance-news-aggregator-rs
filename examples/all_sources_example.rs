@@ -17,9 +17,10 @@ async fn main() -> Result<()> {
         Ok(articles) => {
             println!("WSJ Opinions: {} articles", articles.len());
             for (i, article) in articles.iter().enumerate() {
-                println!("  {}: {}. Link: {}", 
-                    i + 1, 
-                    article.title.as_deref().unwrap_or("No title"), 
+                println!(
+                    "  {}: {}. Link: {}",
+                    i + 1,
+                    article.title.as_deref().unwrap_or("No title"),
                     article.link.as_deref().unwrap_or("No link")
                 );
             }
@@ -34,9 +35,10 @@ async fn main() -> Result<()> {
         Ok(articles) => {
             println!("CNBC Top News: {} articles", articles.len());
             for (i, article) in articles.iter().enumerate() {
-                println!("  {}: {}. Link: {}", 
-                    i + 1, 
-                    article.title.as_deref().unwrap_or("No title"), 
+                println!(
+                    "  {}: {}. Link: {}",
+                    i + 1,
+                    article.title.as_deref().unwrap_or("No title"),
                     article.link.as_deref().unwrap_or("No link")
                 );
             }
@@ -51,9 +53,10 @@ async fn main() -> Result<()> {
         Ok(articles) => {
             println!("NASDAQ Original Content: {} articles", articles.len());
             for (i, article) in articles.iter().enumerate() {
-                println!("  {}: {}. Link: {}", 
-                    i + 1, 
-                    article.title.as_deref().unwrap_or("No title"), 
+                println!(
+                    "  {}: {}. Link: {}",
+                    i + 1,
+                    article.title.as_deref().unwrap_or("No title"),
                     article.link.as_deref().unwrap_or("No link")
                 );
             }
@@ -68,9 +71,10 @@ async fn main() -> Result<()> {
         Ok(articles) => {
             println!("MarketWatch Top Stories: {} articles", articles.len());
             for (i, article) in articles.iter().enumerate() {
-                println!("  {}: {}. Link: {}", 
-                    i + 1, 
-                    article.title.as_deref().unwrap_or("No title"), 
+                println!(
+                    "  {}: {}. Link: {}",
+                    i + 1,
+                    article.title.as_deref().unwrap_or("No title"),
                     article.link.as_deref().unwrap_or("No link")
                 );
             }
@@ -85,9 +89,10 @@ async fn main() -> Result<()> {
         Ok(articles) => {
             println!("Seeking Alpha Latest: {} articles", articles.len());
             for (i, article) in articles.iter().enumerate() {
-                println!("  {}: {}. Link: {}", 
-                    i + 1, 
-                    article.title.as_deref().unwrap_or("No title"), 
+                println!(
+                    "  {}: {}. Link: {}",
+                    i + 1,
+                    article.title.as_deref().unwrap_or("No title"),
                     article.link.as_deref().unwrap_or("No link")
                 );
             }
@@ -102,9 +107,10 @@ async fn main() -> Result<()> {
         Ok(articles) => {
             println!("CNN Finance All Stories: {} articles", articles.len());
             for (i, article) in articles.iter().enumerate() {
-                println!("  {}: {}. Link: {}", 
-                    i + 1, 
-                    article.title.as_deref().unwrap_or("No title"), 
+                println!(
+                    "  {}: {}. Link: {}",
+                    i + 1,
+                    article.title.as_deref().unwrap_or("No title"),
                     article.link.as_deref().unwrap_or("No link")
                 );
             }
@@ -119,9 +125,10 @@ async fn main() -> Result<()> {
         Ok(articles) => {
             println!("Yahoo Finance News: {} articles", articles.len());
             for (i, article) in articles.iter().enumerate() {
-                println!("  {}: {}. Link: {}", 
-                    i + 1, 
-                    article.title.as_deref().unwrap_or("No title"), 
+                println!(
+                    "  {}: {}. Link: {}",
+                    i + 1,
+                    article.title.as_deref().unwrap_or("No title"),
                     article.link.as_deref().unwrap_or("No link")
                 );
             }

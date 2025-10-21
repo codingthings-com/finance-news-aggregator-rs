@@ -1,6 +1,6 @@
+use chrono::{DateTime, Utc};
 use std::collections::HashMap;
 use std::fmt;
-use chrono::{DateTime, Utc};
 
 /// Tracks deprecated endpoints and categorizes failures for reporting
 #[derive(Debug, Clone)]
@@ -33,13 +33,13 @@ impl DeprecationTracker {
 
         // Update counts
         *self.error_counts.entry(error_type).or_insert(0) += 1;
-        
+
         // Store by source
         self.source_failures
             .entry(source.to_string())
             .or_insert_with(Vec::new)
             .push(failure.clone());
-        
+
         self.failures.push(failure);
     }
 
@@ -62,19 +62,19 @@ impl DeprecationTracker {
         };
 
         *self.error_counts.entry(error_type).or_insert(0) += 1;
-        
+
         self.source_failures
             .entry(source.to_string())
             .or_insert_with(Vec::new)
             .push(failure.clone());
-        
+
         self.failures.push(failure);
     }
 
     /// Classify error types for deprecation analysis
     fn classify_error(error: &dyn std::error::Error) -> String {
         let error_msg = error.to_string().to_lowercase();
-        
+
         if error_msg.contains("404") || error_msg.contains("not found") {
             "HTTP_404_NOT_FOUND".to_string()
         } else if error_msg.contains("403") || error_msg.contains("forbidden") {
@@ -85,9 +85,15 @@ impl DeprecationTracker {
             "CONNECTION_ERROR".to_string()
         } else if error_msg.contains("dns") || error_msg.contains("resolve") {
             "DNS_ERROR".to_string()
-        } else if error_msg.contains("parse") || error_msg.contains("xml") || error_msg.contains("json") {
+        } else if error_msg.contains("parse")
+            || error_msg.contains("xml")
+            || error_msg.contains("json")
+        {
             "PARSE_ERROR".to_string()
-        } else if error_msg.contains("500") || error_msg.contains("502") || error_msg.contains("503") {
+        } else if error_msg.contains("500")
+            || error_msg.contains("502")
+            || error_msg.contains("503")
+        {
             "SERVER_ERROR".to_string()
         } else if error_msg.contains("429") || error_msg.contains("rate limit") {
             "RATE_LIMITED".to_string()
@@ -219,7 +225,11 @@ impl fmt::Display for DeprecationReport {
         writeln!(f)?;
 
         if !self.deprecated_endpoints.is_empty() {
-            writeln!(f, "Deprecated Endpoints ({}):", self.deprecated_endpoints.len())?;
+            writeln!(
+                f,
+                "Deprecated Endpoints ({}):",
+                self.deprecated_endpoints.len()
+            )?;
             for endpoint in &self.deprecated_endpoints {
                 writeln!(
                     f,
@@ -296,7 +306,7 @@ mod tests {
     #[test]
     fn test_deprecation_report_generation() {
         let mut tracker = DeprecationTracker::new();
-        
+
         // Add multiple failures for the same function
         for _ in 0..3 {
             let error = TestError {
@@ -307,6 +317,10 @@ mod tests {
 
         let report = tracker.generate_report();
         assert_eq!(report.deprecated_endpoints.len(), 3);
-        assert!(report.removal_candidates.contains(&"TestSource::deprecated_function".to_string()));
+        assert!(
+            report
+                .removal_candidates
+                .contains(&"TestSource::deprecated_function".to_string())
+        );
     }
 }

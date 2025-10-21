@@ -11,7 +11,7 @@ async fn test_nasdaq_basic_functionality() {
     let nasdaq = NASDAQ::new(client);
 
     assert_eq!(nasdaq.name(), "NASDAQ");
-    
+
     let topics = nasdaq.available_topics();
     assert!(!topics.is_empty());
     assert!(topics.contains(&"original"));
@@ -95,6 +95,13 @@ async fn test_nasdaq_all_topics() {
         }
     }
 
-    println!("\nNASDAQ Summary: {}/{} topics accessible", successful, topics.len());
-    assert!(successful > 0, "At least one NASDAQ feed should be accessible");
+    println!(
+        "\nNASDAQ Summary: {}/{} topics accessible",
+        successful,
+        topics.len()
+    );
+    assert!(
+        successful > 0,
+        "At least one NASDAQ feed should be accessible"
+    );
 }

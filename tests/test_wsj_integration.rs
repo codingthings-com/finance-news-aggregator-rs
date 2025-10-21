@@ -11,7 +11,7 @@ async fn test_wsj_basic_functionality() {
     let wsj = WallStreetJournal::new(client);
 
     assert_eq!(wsj.name(), "Wall Street Journal");
-    
+
     let topics = wsj.available_topics();
     assert!(!topics.is_empty());
 }
@@ -119,6 +119,10 @@ async fn test_wsj_all_topics() {
         }
     }
 
-    println!("\nWSJ Summary: {}/{} topics accessible", successful, topics.len());
+    println!(
+        "\nWSJ Summary: {}/{} topics accessible",
+        successful,
+        topics.len()
+    );
     assert!(successful > 0, "At least one WSJ feed should be accessible");
 }

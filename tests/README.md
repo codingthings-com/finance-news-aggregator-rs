@@ -130,28 +130,16 @@ async fn test_source_all_topics() {
 
 ## Test Results
 
-Current feed accessibility status:
+All news sources are tested equally. Feed accessibility varies by source and can change over time due to:
+- RSS feed URL changes
+- Temporary network issues
+- XML formatting issues in the feeds
+- Rate limiting
 
-| Source | Topics | Accessible | Success Rate | Notes |
-|--------|--------|------------|--------------|-------|
-| **NASDAQ** | 10 | 10 | 100% | All feeds working |
-| **CNBC** | 24 | 24 | 100% | All feeds working |
-| **CNN Finance** | 11 | 8 | 73% | Some XML parsing issues |
-| **WSJ** | 6 | 6 | 100% | All feeds working |
-| **Yahoo Finance** | 2 | 2 | 100% | All feeds working |
-| **Seeking Alpha** | 12 | 12 | 100% | All feeds working |
-| **MarketWatch** | 13 | 4 | 31% | Many XML parsing issues |
-
-### Known Issues
-
-**CNN Finance:**
-- `money_news_investing` - XML parsing error
-- `money_real_estate` - XML parsing error
-- `morning_buzz` - XML parsing error
-
-**MarketWatch:**
-- Multiple feeds have XML entity reference issues
-- Only core feeds (top_stories, real_time_headlines, market_pulse, bulletins) are reliable
+Run the tests to see current accessibility status:
+```bash
+cargo test --tests -- --nocapture
+```
 
 ## Running Tests
 
@@ -209,9 +197,9 @@ let report = tracker.generate_report();
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `CI` | Enable CI mode (shorter timeouts) | `false` |
 | `INTEGRATION_TIMEOUT` | Network timeout in seconds | `30` |
 | `INTEGRATION_RETRIES` | Max retry attempts | `3` |
+| `SKIP_NETWORK_TESTS` | Skip network connectivity tests | `false` |
 
 ### Examples
 
@@ -219,11 +207,11 @@ let report = tracker.generate_report();
 # Run with longer timeout
 INTEGRATION_TIMEOUT=60 cargo test --tests
 
-# Run in CI mode
-CI=1 cargo test --tests
-
 # Run with more retries
 INTEGRATION_RETRIES=5 cargo test --tests
+
+# Skip network tests
+SKIP_NETWORK_TESTS=1 cargo test --tests
 ```
 
 ## Adding New Tests
@@ -274,10 +262,14 @@ If tests are timing out:
 INTEGRATION_TIMEOUT=60 cargo test --tests
 ```
 
-### Rate Limiting
-If you're hitting rate limits, run tests sequentially:
+### Rate Limiting or Timeouts
+If you're experiencing issues, try:
 ```bash
+# Run tests sequentially
 cargo test --tests -- --test-threads=1
+
+# Increase timeout
+INTEGRATION_TIMEOUT=60 cargo test --tests
 ```
 
 ### Debugging Failures
@@ -286,8 +278,14 @@ Run with output to see detailed error messages:
 cargo test --test test_source_integration -- --nocapture
 ```
 
-### CI Failures
-Tests may fail in CI due to network issues. This is expected and tests should be retried.
+### Test Failures
+Tests may fail due to:
+- Network connectivity issues
+- Temporary RSS feed unavailability
+- XML parsing errors in the feed content
+- Rate limiting from the news source
+
+This is normal for integration tests that depend on external services. Retry the tests if failures occur.
 
 ## Contributing
 

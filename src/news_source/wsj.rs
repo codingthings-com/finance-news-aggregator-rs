@@ -7,7 +7,7 @@ use reqwest::Client;
 use std::collections::HashMap;
 
 /// Wall Street Journal news client
-/// 
+///
 /// Provides access to Wall Street Journal RSS feeds including opinions, world news,
 /// business, markets, technology, and lifestyle content.
 pub struct WallStreetJournal {
@@ -18,14 +18,17 @@ pub struct WallStreetJournal {
 
 impl WallStreetJournal {
     /// Create a new Wall Street Journal client
-    /// 
+    ///
     /// Initializes the client with WSJ RSS feed URL patterns.
     pub fn new(client: Client) -> Self {
-        Self::with_config(client, SourceConfig::new("https://feeds.a.dj.com/rss/{topic}.xml"))
+        Self::with_config(
+            client,
+            SourceConfig::new("https://feeds.a.dj.com/rss/{topic}.xml"),
+        )
     }
 
     /// Create a new Wall Street Journal client with custom config
-    /// 
+    ///
     /// # Arguments
     /// * `client` - HTTP client for making requests
     /// * `config` - Source configuration (only base_url is used)

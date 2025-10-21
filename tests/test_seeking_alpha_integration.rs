@@ -11,7 +11,7 @@ async fn test_seeking_alpha_basic_functionality() {
     let seeking_alpha = SeekingAlpha::new(client);
 
     assert_eq!(seeking_alpha.name(), "Seeking Alpha");
-    
+
     let topics = seeking_alpha.available_topics();
     assert!(!topics.is_empty());
 }
@@ -93,6 +93,13 @@ async fn test_seeking_alpha_all_topics() {
         }
     }
 
-    println!("\nSeeking Alpha Summary: {}/{} topics accessible", successful, topics.len());
-    assert!(successful > 0, "At least one Seeking Alpha feed should be accessible");
+    println!(
+        "\nSeeking Alpha Summary: {}/{} topics accessible",
+        successful,
+        topics.len()
+    );
+    assert!(
+        successful > 0,
+        "At least one Seeking Alpha feed should be accessible"
+    );
 }

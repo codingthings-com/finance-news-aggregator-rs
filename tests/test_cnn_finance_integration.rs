@@ -11,9 +11,10 @@ async fn test_cnn_finance_basic_functionality() {
     let cnn_finance = CNNFinance::new(client);
 
     assert_eq!(cnn_finance.name(), "CNN Finance");
-    
+
     let topics = cnn_finance.available_topics();
     assert!(!topics.is_empty());
+    assert_eq!(topics.len(), 8); // 8 working feeds
 }
 
 #[tokio::test]
@@ -106,6 +107,13 @@ async fn test_cnn_finance_all_topics() {
         }
     }
 
-    println!("\nCNN Finance Summary: {}/{} topics accessible", successful, topics.len());
-    assert!(successful > 0, "At least one CNN Finance feed should be accessible");
+    println!(
+        "\nCNN Finance Summary: {}/{} topics accessible",
+        successful,
+        topics.len()
+    );
+    assert!(
+        successful > 0,
+        "At least one CNN Finance feed should be accessible"
+    );
 }

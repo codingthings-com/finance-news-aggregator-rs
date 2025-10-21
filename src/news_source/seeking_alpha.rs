@@ -7,7 +7,7 @@ use reqwest::Client;
 use std::collections::HashMap;
 
 /// Seeking Alpha news client
-/// 
+///
 /// Provides access to Seeking Alpha RSS feeds for investment research, market analysis,
 /// stock ideas, IPO analysis, earnings transcripts, and more.
 pub struct SeekingAlpha {
@@ -18,12 +18,15 @@ pub struct SeekingAlpha {
 
 impl SeekingAlpha {
     /// Create a new Seeking Alpha client
-    /// 
+    ///
     /// Initializes the client with Seeking Alpha RSS feed URL.
     pub fn new(client: Client) -> Self {
         let mut url_map = HashMap::new();
-        url_map.insert("base".to_string(), "https://seekingalpha.com/feed.xml".to_string());
-        
+        url_map.insert(
+            "base".to_string(),
+            "https://seekingalpha.com/feed.xml".to_string(),
+        );
+
         Self {
             url_map,
             client,
@@ -92,15 +95,16 @@ impl SeekingAlpha {
     }
 
     /// Get global markets by country
-    /// 
+    ///
     /// # Arguments
     /// * `country` - Country code or name (e.g., "china", "india", "brazil")
     pub async fn global_markets(&self, country: &str) -> Result<Vec<NewsArticle>> {
-        self.fetch_topic(&format!("global-markets-{}", country)).await
+        self.fetch_topic(&format!("global-markets-{}", country))
+            .await
     }
 
     /// Get sectors by sector name
-    /// 
+    ///
     /// # Arguments
     /// * `sector` - Sector name (e.g., "technology", "healthcare", "energy")
     pub async fn sectors(&self, sector: &str) -> Result<Vec<NewsArticle>> {
@@ -108,7 +112,7 @@ impl SeekingAlpha {
     }
 
     /// Get stocks by ticker symbol
-    /// 
+    ///
     /// # Arguments
     /// * `ticker` - Stock ticker symbol (e.g., "AAPL", "GOOGL", "MSFT")
     pub async fn stocks(&self, ticker: &str) -> Result<Vec<NewsArticle>> {
@@ -136,10 +140,11 @@ impl NewsSource for SeekingAlpha {
 
     // Override build_topic_url for Seeking Alpha's query parameter structure
     fn build_topic_url(&self, topic: &str) -> Result<String> {
-        let base_url = self.url_map()
+        let base_url = self
+            .url_map()
             .get("base")
             .ok_or_else(|| crate::error::FanError::InvalidUrl("Base URL not found".to_string()))?;
-        
+
         Ok(format!("{}?category={}", base_url, topic))
     }
 

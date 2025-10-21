@@ -1,6 +1,6 @@
+use fake_user_agent::get_safari_rua;
 use reqwest::{Client, ClientBuilder};
 use std::time::Duration;
-use fake_user_agent::get_safari_rua;
 
 /// Factory for creating standardized HTTP clients for integration testing
 pub struct ClientFactory;
@@ -14,7 +14,7 @@ impl ClientFactory {
     /// Create an HTTP client with custom timeout
     pub fn create_client_with_timeout(timeout: Duration) -> Result<Client, reqwest::Error> {
         let user_agent = get_safari_rua();
-        
+
         ClientBuilder::new()
             .timeout(timeout)
             .connect_timeout(Duration::from_secs(10))
@@ -27,7 +27,7 @@ impl ClientFactory {
     /// Create a client with retry-friendly configuration
     pub fn create_retry_client() -> Result<Client, reqwest::Error> {
         let user_agent = get_safari_rua();
-        
+
         ClientBuilder::new()
             .timeout(Duration::from_secs(45))
             .connect_timeout(Duration::from_secs(15))
@@ -67,7 +67,8 @@ impl Default for RetryConfig {
 impl RetryConfig {
     /// Calculate delay for a given attempt number (0-based)
     pub fn calculate_delay(&self, attempt: u32) -> Duration {
-        let delay_ms = (self.base_delay_ms as f64 * self.backoff_multiplier.powi(attempt as i32)) as u64;
+        let delay_ms =
+            (self.base_delay_ms as f64 * self.backoff_multiplier.powi(attempt as i32)) as u64;
         let capped_delay = delay_ms.min(self.max_delay_ms);
         Duration::from_millis(capped_delay)
     }
@@ -80,7 +81,7 @@ mod tests {
     #[test]
     fn test_retry_config_delay_calculation() {
         let config = RetryConfig::default();
-        
+
         assert_eq!(config.calculate_delay(0), Duration::from_millis(1000));
         assert_eq!(config.calculate_delay(1), Duration::from_millis(2000));
         assert_eq!(config.calculate_delay(2), Duration::from_millis(4000));

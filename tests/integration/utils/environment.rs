@@ -1,5 +1,5 @@
-use std::env;
 use std::collections::HashMap;
+use std::env;
 
 /// Environment configuration for integration tests
 #[derive(Debug, Clone)]
@@ -29,7 +29,7 @@ impl EnvironmentConfig {
     /// Create environment configuration based on environment variables
     pub fn from_env() -> Self {
         let test_mode = Self::detect_test_mode();
-        
+
         match test_mode {
             TestMode::Local => Self::local_config(),
             TestMode::CI => Self::ci_config(),
@@ -41,7 +41,10 @@ impl EnvironmentConfig {
     fn detect_test_mode() -> TestMode {
         if env::var("NIGHTLY_BUILD").is_ok() || env::var("INTEGRATION_NIGHTLY").is_ok() {
             TestMode::Nightly
-        } else if env::var("CI").is_ok() || env::var("GITHUB_ACTIONS").is_ok() || env::var("CONTINUOUS_INTEGRATION").is_ok() {
+        } else if env::var("CI").is_ok()
+            || env::var("GITHUB_ACTIONS").is_ok()
+            || env::var("CONTINUOUS_INTEGRATION").is_ok()
+        {
             TestMode::CI
         } else {
             TestMode::Local
@@ -55,8 +58,14 @@ impl EnvironmentConfig {
             timeout_seconds: Self::env_var_or_default("INTEGRATION_TIMEOUT", 45),
             max_retries: Self::env_var_or_default("INTEGRATION_RETRIES", 3),
             sources_filter: Self::parse_sources_filter(),
-            enable_deprecation_tracking: Self::env_var_or_default("ENABLE_DEPRECATION_TRACKING", true),
-            enable_performance_tracking: Self::env_var_or_default("ENABLE_PERFORMANCE_TRACKING", true),
+            enable_deprecation_tracking: Self::env_var_or_default(
+                "ENABLE_DEPRECATION_TRACKING",
+                true,
+            ),
+            enable_performance_tracking: Self::env_var_or_default(
+                "ENABLE_PERFORMANCE_TRACKING",
+                true,
+            ),
             parallel_execution: Self::env_var_or_default("PARALLEL_EXECUTION", true),
             verbose_output: Self::env_var_or_default("VERBOSE_OUTPUT", true),
         }
@@ -69,8 +78,14 @@ impl EnvironmentConfig {
             timeout_seconds: Self::env_var_or_default("INTEGRATION_TIMEOUT", 30),
             max_retries: Self::env_var_or_default("INTEGRATION_RETRIES", 2),
             sources_filter: Self::parse_sources_filter(),
-            enable_deprecation_tracking: Self::env_var_or_default("ENABLE_DEPRECATION_TRACKING", false),
-            enable_performance_tracking: Self::env_var_or_default("ENABLE_PERFORMANCE_TRACKING", false),
+            enable_deprecation_tracking: Self::env_var_or_default(
+                "ENABLE_DEPRECATION_TRACKING",
+                false,
+            ),
+            enable_performance_tracking: Self::env_var_or_default(
+                "ENABLE_PERFORMANCE_TRACKING",
+                false,
+            ),
             parallel_execution: Self::env_var_or_default("PARALLEL_EXECUTION", false),
             verbose_output: Self::env_var_or_default("VERBOSE_OUTPUT", false),
         }
@@ -103,15 +118,13 @@ impl EnvironmentConfig {
 
     /// Parse sources filter from environment variable
     fn parse_sources_filter() -> Option<Vec<String>> {
-        env::var("INTEGRATION_SOURCES")
-            .ok()
-            .map(|sources| {
-                sources
-                    .split(',')
-                    .map(|s| s.trim().to_string())
-                    .filter(|s| !s.is_empty())
-                    .collect()
-            })
+        env::var("INTEGRATION_SOURCES").ok().map(|sources| {
+            sources
+                .split(',')
+                .map(|s| s.trim().to_string())
+                .filter(|s| !s.is_empty())
+                .collect()
+        })
     }
 
     /// Check if a specific source should be tested
@@ -125,29 +138,29 @@ impl EnvironmentConfig {
     /// Get feature flags for conditional test execution
     pub fn get_feature_flags() -> HashMap<String, bool> {
         let mut flags = HashMap::new();
-        
+
         // Network-dependent tests
         flags.insert(
             "network_tests".to_string(),
-            !Self::env_var_or_default("SKIP_NETWORK_TESTS", false)
+            !Self::env_var_or_default("SKIP_NETWORK_TESTS", false),
         );
-        
+
         // Performance regression tests
         flags.insert(
             "performance_tests".to_string(),
-            Self::env_var_or_default("ENABLE_PERFORMANCE_TESTS", false)
+            Self::env_var_or_default("ENABLE_PERFORMANCE_TESTS", false),
         );
-        
+
         // Deprecation scanning
         flags.insert(
             "deprecation_scan".to_string(),
-            Self::env_var_or_default("ENABLE_DEPRECATION_SCAN", false)
+            Self::env_var_or_default("ENABLE_DEPRECATION_SCAN", false),
         );
-        
+
         // Comprehensive validation
         flags.insert(
             "comprehensive_validation".to_string(),
-            Self::env_var_or_default("ENABLE_COMPREHENSIVE_VALIDATION", true)
+            Self::env_var_or_default("ENABLE_COMPREHENSIVE_VALIDATION", true),
         );
 
         flags
@@ -231,12 +244,12 @@ mod tests {
             env::set_var("INTEGRATION_SOURCES", "CNBC,WSJ,YahooFinance");
         }
         let config = EnvironmentConfig::from_env();
-        
+
         assert!(config.should_test_source("CNBC"));
         assert!(config.should_test_source("WSJ"));
         assert!(config.should_test_source("YahooFinance"));
         assert!(!config.should_test_source("NASDAQ"));
-        
+
         unsafe {
             env::remove_var("INTEGRATION_SOURCES");
         }
@@ -248,11 +261,11 @@ mod tests {
             env::set_var("SKIP_NETWORK_TESTS", "true");
             env::set_var("ENABLE_PERFORMANCE_TESTS", "true");
         }
-        
+
         let flags = EnvironmentConfig::get_feature_flags();
         assert_eq!(flags.get("network_tests"), Some(&false));
         assert_eq!(flags.get("performance_tests"), Some(&true));
-        
+
         unsafe {
             env::remove_var("SKIP_NETWORK_TESTS");
             env::remove_var("ENABLE_PERFORMANCE_TESTS");

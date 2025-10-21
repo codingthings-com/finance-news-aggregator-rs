@@ -7,7 +7,7 @@ use reqwest::Client;
 use std::collections::HashMap;
 
 /// NASDAQ news client
-/// 
+///
 /// Provides access to NASDAQ RSS feeds covering stocks, commodities, cryptocurrency,
 /// earnings, economics, and technology news.
 pub struct NASDAQ {
@@ -18,13 +18,19 @@ pub struct NASDAQ {
 
 impl NASDAQ {
     /// Create a new NASDAQ client
-    /// 
+    ///
     /// Initializes the client with NASDAQ RSS feed URLs.
     pub fn new(client: Client) -> Self {
         let mut url_map = HashMap::new();
-        url_map.insert("base".to_string(), "https://www.nasdaq.com/feed/rssoutbound".to_string());
-        url_map.insert("original".to_string(), "https://www.nasdaq.com/feed/nasdaq-original/rss.xml".to_string());
-        
+        url_map.insert(
+            "base".to_string(),
+            "https://www.nasdaq.com/feed/rssoutbound".to_string(),
+        );
+        url_map.insert(
+            "original".to_string(),
+            "https://www.nasdaq.com/feed/nasdaq-original/rss.xml".to_string(),
+        );
+
         Self {
             url_map,
             client,
@@ -107,13 +113,15 @@ impl NewsSource for NASDAQ {
             // Special case: original content has its own dedicated URL
             self.url_map()
                 .get("original")
-                .ok_or_else(|| crate::error::FanError::InvalidUrl("Original URL not found".to_string()))
+                .ok_or_else(|| {
+                    crate::error::FanError::InvalidUrl("Original URL not found".to_string())
+                })
                 .map(|s| s.clone())
         } else {
             // Standard topics use the base URL with category parameter
-            let base_url = self.url_map()
-                .get("base")
-                .ok_or_else(|| crate::error::FanError::InvalidUrl("Base URL not found".to_string()))?;
+            let base_url = self.url_map().get("base").ok_or_else(|| {
+                crate::error::FanError::InvalidUrl("Base URL not found".to_string())
+            })?;
             Ok(format!("{}?category={}", base_url, topic))
         }
     }

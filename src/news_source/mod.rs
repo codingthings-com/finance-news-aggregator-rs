@@ -23,7 +23,7 @@ pub use wsj::WallStreetJournal;
 pub use yahoo_finance::YahooFinance;
 
 /// Common trait for all news sources
-/// 
+///
 /// This trait defines the interface for fetching news from various RSS feed sources.
 /// It provides both generic URL-based fetching and topic-based fetching with default
 /// implementations that handle common patterns.
@@ -33,7 +33,7 @@ pub trait NewsSource {
     fn name(&self) -> &'static str;
 
     /// Get the URL map containing named URLs for this source
-    /// 
+    ///
     /// Returns a HashMap where keys are URL identifiers (e.g., "base", "buzz", "original")
     /// and values are the actual URL patterns or endpoints.
     fn url_map(&self) -> &HashMap<String, String>;
@@ -45,33 +45,34 @@ pub trait NewsSource {
     fn parser(&self) -> &NewsParser;
 
     /// Build the URL for a given topic
-    /// 
+    ///
     /// This method provides the topic-to-URL mapping logic. The default implementation
     /// uses simple pattern substitution with the base URL. Sources can override this
     /// to implement custom mapping logic (e.g., topic ID mapping, special endpoints).
-    /// 
+    ///
     /// # Arguments
     /// * `topic` - The topic identifier
-    /// 
+    ///
     /// # Returns
     /// The complete URL for the topic, or an error if the topic is invalid
     fn build_topic_url(&self, topic: &str) -> Result<String> {
         // Default implementation: simple pattern substitution
-        let base_url = self.url_map()
+        let base_url = self
+            .url_map()
             .get("base")
             .ok_or_else(|| crate::error::FanError::InvalidUrl("Base URL not found".to_string()))?;
-        
+
         Ok(base_url.replace("{topic}", topic))
     }
 
     /// Generic method to fetch a feed from any RSS URL
-    /// 
+    ///
     /// This method provides a default implementation that can be used by all news sources.
     /// It fetches the RSS feed from the given URL, parses it, and sets the source attribution.
-    /// 
+    ///
     /// # Arguments
     /// * `url` - The complete RSS feed URL to fetch
-    /// 
+    ///
     /// # Returns
     /// A vector of parsed NewsArticle objects
     async fn fetch_feed_by_url(&self, url: &str) -> Result<Vec<NewsArticle>> {
@@ -94,14 +95,14 @@ pub trait NewsSource {
     }
 
     /// Fetch news articles for a specific topic
-    /// 
+    ///
     /// This method maps topic names to their corresponding feed URLs and fetches them.
     /// The default implementation uses `build_topic_url()` for URL construction.
     /// Sources with complex logic can override this method.
-    /// 
+    ///
     /// # Arguments
     /// * `topic` - The topic identifier (e.g., "headlines", "technology", "markets")
-    /// 
+    ///
     /// # Returns
     /// A vector of parsed NewsArticle objects for the requested topic
     async fn fetch_topic(&self, topic: &str) -> Result<Vec<NewsArticle>> {
@@ -111,7 +112,7 @@ pub trait NewsSource {
     }
 
     /// Get available topics/feeds for this source
-    /// 
+    ///
     /// Returns a list of topic identifiers that can be used with `fetch_topic()`
     fn available_topics(&self) -> Vec<&'static str>;
 }

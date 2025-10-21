@@ -11,7 +11,7 @@ async fn test_cnbc_basic_functionality() {
     let cnbc = CNBC::new(client);
 
     assert_eq!(cnbc.name(), "CNBC");
-    
+
     let topics = cnbc.available_topics();
     assert!(!topics.is_empty());
 }
@@ -106,6 +106,13 @@ async fn test_cnbc_all_topics() {
         }
     }
 
-    println!("\nCNBC Summary: {}/{} topics accessible", successful, topics.len());
-    assert!(successful > 0, "At least one CNBC feed should be accessible");
+    println!(
+        "\nCNBC Summary: {}/{} topics accessible",
+        successful,
+        topics.len()
+    );
+    assert!(
+        successful > 0,
+        "At least one CNBC feed should be accessible"
+    );
 }

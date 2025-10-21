@@ -11,9 +11,10 @@ async fn test_market_watch_basic_functionality() {
     let market_watch = MarketWatch::new(client);
 
     assert_eq!(market_watch.name(), "MarketWatch");
-    
+
     let topics = market_watch.available_topics();
     assert!(!topics.is_empty());
+    assert_eq!(topics.len(), 4); // Only 4 working feeds
 }
 
 #[tokio::test]
@@ -93,6 +94,13 @@ async fn test_market_watch_all_topics() {
         }
     }
 
-    println!("\nMarketWatch Summary: {}/{} topics accessible", successful, topics.len());
-    assert!(successful > 0, "At least one MarketWatch feed should be accessible");
+    println!(
+        "\nMarketWatch Summary: {}/{} topics accessible",
+        successful,
+        topics.len()
+    );
+    assert!(
+        successful > 0,
+        "At least one MarketWatch feed should be accessible"
+    );
 }

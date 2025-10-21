@@ -11,7 +11,7 @@ async fn test_yahoo_finance_basic_functionality() {
     let yahoo_finance = YahooFinance::new(client);
 
     assert_eq!(yahoo_finance.name(), "Yahoo Finance");
-    
+
     let topics = yahoo_finance.available_topics();
     assert!(!topics.is_empty());
     assert_eq!(topics.len(), 2);
@@ -54,7 +54,10 @@ async fn test_yahoo_finance_headline_with_symbols() {
     let symbols = vec!["AAPL", "MSFT", "GOOGL"];
     match yahoo_finance.headline(&symbols).await {
         Ok(articles) => {
-            println!("✓ headline with symbols returned {} articles", articles.len());
+            println!(
+                "✓ headline with symbols returned {} articles",
+                articles.len()
+            );
         }
         Err(e) => println!("✗ headline with symbols failed: {}", e),
     }
@@ -82,6 +85,13 @@ async fn test_yahoo_finance_all_topics() {
         }
     }
 
-    println!("\nYahoo Finance Summary: {}/{} topics accessible", successful, topics.len());
-    assert!(successful > 0, "At least one Yahoo Finance feed should be accessible");
+    println!(
+        "\nYahoo Finance Summary: {}/{} topics accessible",
+        successful,
+        topics.len()
+    );
+    assert!(
+        successful > 0,
+        "At least one Yahoo Finance feed should be accessible"
+    );
 }

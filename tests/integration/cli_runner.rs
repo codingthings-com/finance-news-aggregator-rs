@@ -11,12 +11,12 @@ impl CliRunner {
     /// Run integration tests from command line
     pub async fn run() {
         let args: Vec<String> = env::args().collect();
-        
+
         // Parse command line arguments
         let mut sources_filter = None;
         let mut verbose = false;
         let mut help = false;
-        
+
         let mut i = 1;
         while i < args.len() {
             match args[i].as_str() {
@@ -44,56 +44,58 @@ impl CliRunner {
                 }
             }
         }
-        
+
         if help {
             Self::print_help();
             return;
         }
-        
+
         // Set environment variables based on CLI args
         if let Some(sources) = sources_filter {
             unsafe {
                 env::set_var("INTEGRATION_SOURCES", sources);
             }
         }
-        
+
         if verbose {
             unsafe {
                 env::set_var("VERBOSE_OUTPUT", "true");
             }
         }
-        
+
         // Initialize logging
         let log_level = if verbose {
             log::LevelFilter::Debug
         } else {
             log::LevelFilter::Info
         };
-        
-        let _ = env_logger::builder()
-            .filter_level(log_level)
-            .try_init();
-        
+
+        let _ = env_logger::builder().filter_level(log_level).try_init();
+
         println!("🚀 Finance News Aggregator - Integration Test Runner");
         println!("Environment: {:?}", EnvironmentConfig::from_env().test_mode);
-        
+
         if let Some(ref sources) = env::var("INTEGRATION_SOURCES").ok() {
             println!("Testing sources: {}", sources);
         }
-        
+
         println!();
-        
+
         // Create and run tests
         match IntegrationTestRunner::new().await {
             Ok(mut runner) => {
                 match runner.run_all_tests().await {
                     Ok(summary) => {
                         println!("✅ Integration tests completed successfully");
-                        
+
                         // Exit with appropriate code based on results
-                        let success_rate = summary.successful_tests as f64 / summary.total_tests as f64;
+                        let success_rate =
+                            summary.successful_tests as f64 / summary.total_tests as f64;
                         if success_rate < 0.5 {
-                            println!("❌ Test suite failed - success rate too low: {:.1}%", success_rate * 100.0);
+                            println!(
+                                "❌ Test suite failed - success rate too low: {:.1}%",
+                                success_rate * 100.0
+                            );
                             process::exit(1);
                         }
                     }
@@ -109,7 +111,7 @@ impl CliRunner {
             }
         }
     }
-    
+
     /// Print help message
     fn print_help() {
         println!("Finance News Aggregator - Integration Test Runner");
@@ -119,15 +121,21 @@ impl CliRunner {
         println!();
         println!("OPTIONS:");
         println!("    -s, --sources <SOURCES>    Comma-separated list of sources to test");
-        println!("                               (CNBC,CNNFinance,MarketWatch,NASDAQ,SeekingAlpha,WallStreetJournal,YahooFinance)");
+        println!(
+            "                               (CNBC,CNNFinance,MarketWatch,NASDAQ,SeekingAlpha,WallStreetJournal,YahooFinance)"
+        );
         println!("    -v, --verbose              Enable verbose output");
         println!("    -h, --help                 Print this help message");
         println!();
         println!("ENVIRONMENT VARIABLES:");
         println!("    CI=1                       Run in CI mode (faster, less comprehensive)");
-        println!("    NIGHTLY_BUILD=1            Run in nightly mode (comprehensive deprecation scan)");
+        println!(
+            "    NIGHTLY_BUILD=1            Run in nightly mode (comprehensive deprecation scan)"
+        );
         println!("    INTEGRATION_SOURCES        Comma-separated list of sources to test");
-        println!("    INTEGRATION_TIMEOUT        Timeout in seconds for network operations (default: 30)");
+        println!(
+            "    INTEGRATION_TIMEOUT        Timeout in seconds for network operations (default: 30)"
+        );
         println!("    SKIP_NETWORK_TESTS=1       Skip network connectivity tests");
         println!("    ENABLE_DEPRECATION_TRACKING=1  Enable deprecation detection");
         println!("    ENABLE_PERFORMANCE_TRACKING=1  Enable performance monitoring");
@@ -138,7 +146,9 @@ impl CliRunner {
         println!("    cargo test --test integration_test_suite");
         println!();
         println!("    # Test only CNBC and WSJ");
-        println!("    INTEGRATION_SOURCES=CNBC,WallStreetJournal cargo test --test integration_test_suite");
+        println!(
+            "    INTEGRATION_SOURCES=CNBC,WallStreetJournal cargo test --test integration_test_suite"
+        );
         println!();
         println!("    # Run in CI mode");
         println!("    CI=1 cargo test --test integration_test_suite");
@@ -148,7 +158,9 @@ impl CliRunner {
         println!();
         println!("    # Run specific test categories");
         println!("    cargo test --test integration_test_suite run_cnbc_only_tests -- --ignored");
-        println!("    cargo test --test integration_test_suite run_performance_regression_tests -- --ignored");
+        println!(
+            "    cargo test --test integration_test_suite run_performance_regression_tests -- --ignored"
+        );
     }
 }
 
@@ -170,8 +182,12 @@ pub fn example_usage() {
     println!("   NIGHTLY_BUILD=1 cargo test --test integration_test_suite");
     println!();
     println!("5. Run performance tests:");
-    println!("   cargo test --test integration_test_suite run_performance_regression_tests -- --ignored");
+    println!(
+        "   cargo test --test integration_test_suite run_performance_regression_tests -- --ignored"
+    );
     println!();
     println!("6. Run deprecation detection:");
-    println!("   cargo test --test integration_test_suite run_deprecation_detection_tests -- --ignored");
+    println!(
+        "   cargo test --test integration_test_suite run_deprecation_detection_tests -- --ignored"
+    );
 }
