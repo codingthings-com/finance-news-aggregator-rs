@@ -120,39 +120,9 @@ async fn main() -> Result<()> {
     }
     println!();
 
-    // Example 5: Inspect URL map
-    println!("5. Inspecting URL Maps");
-    println!("----------------------");
-    {
-        let cnn = client.cnn_finance();
-        let url_map = cnn.url_map();
-        println!("CNN Finance URL map:");
-        for (name, url) in url_map {
-            println!("  {}: {}", name, url);
-        }
-    }
-    println!();
-
-    // Example 6: Fetch special endpoints
-    println!("6. Fetching Special Endpoints");
+    // Example 5: Fetch special endpoints
+    println!("5. Fetching Special Endpoints");
     println!("------------------------------");
-
-    // CNN has a special "morning_buzz" endpoint
-    {
-        let cnn = client.cnn_finance();
-        match cnn.fetch_topic("morning_buzz").await {
-            Ok(articles) => {
-                println!("✓ CNN Morning Buzz: {} articles", articles.len());
-                if let Some(first) = articles.first() {
-                    println!(
-                        "  First article: {}",
-                        first.title.as_ref().unwrap_or(&"No title".to_string())
-                    );
-                }
-            }
-            Err(e) => println!("✗ Error fetching CNN morning buzz: {}", e),
-        }
-    }
 
     // NASDAQ has a special "original" content endpoint
     {

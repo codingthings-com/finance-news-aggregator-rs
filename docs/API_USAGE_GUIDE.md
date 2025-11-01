@@ -72,9 +72,6 @@ let custom_feed = generic.fetch_feed_by_url("https://example.com/feed.xml").awai
 ### Seeking Alpha (12)
 `latest_articles()`, `all_news()`, `market_news()`, `editors_picks()`, `etfs()`, `forex()`, `ipo_analysis()`, `long_ideas()`, `short_ideas()`, `transcripts()`, `wall_street_breakfast()`, `most_popular_articles()`
 
-### CNN Finance (8)
-`all_stories()`, `companies()`, `economy()`, `international()`, `markets()`, `media()`, `personal_finance()`, `technology()`
-
 ### Yahoo Finance (2 + symbols)
 `headlines()`, `topstories()`, `headline(&["AAPL", "MSFT"])`
 

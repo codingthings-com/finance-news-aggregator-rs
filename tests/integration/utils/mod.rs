@@ -97,7 +97,6 @@ impl Default for IntegrationTestConfig {
         Self {
             sources_to_test: vec![
                 "CNBC".to_string(),
-                "CNNFinance".to_string(),
                 "MarketWatch".to_string(),
                 "NASDAQ".to_string(),
                 "SeekingAlpha".to_string(),

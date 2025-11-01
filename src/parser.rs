@@ -94,14 +94,6 @@ impl NewsParser {
         );
 
         namespaces.insert(
-            "cnn_finance".to_string(),
-            vec![
-                "http://rssnamespace.org/feedburner/ext/1.0".to_string(),
-                "http://search.yahoo.com/mrss/".to_string(),
-            ],
-        );
-
-        namespaces.insert(
             "yahoo".to_string(),
             vec!["http://search.yahoo.com/mrss/".to_string()],
         );

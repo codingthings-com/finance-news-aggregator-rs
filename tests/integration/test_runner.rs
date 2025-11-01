@@ -13,7 +13,7 @@ use crate::integration::utils::{
 };
 
 use finance_news_aggregator_rs::news_source::{
-    NewsSource, cnbc::CNBC, cnn_finance::CNNFinance, market_watch::MarketWatch, nasdaq::NASDAQ,
+    NewsSource, cnbc::CNBC, market_watch::MarketWatch, nasdaq::NASDAQ,
     seeking_alpha::SeekingAlpha, wsj::WallStreetJournal, yahoo_finance::YahooFinance,
 };
 
@@ -102,7 +102,6 @@ impl IntegrationTestRunner {
     fn get_sources_to_test(&self) -> Vec<&'static str> {
         let all_sources = vec![
             "CNBC",
-            "CNNFinance",
             "MarketWatch",
             "NASDAQ",
             "SeekingAlpha",
@@ -186,7 +185,6 @@ impl IntegrationTestRunner {
         let test_future = async {
             match source_name {
                 "CNBC" => Self::test_cnbc_source(client).await,
-                "CNNFinance" => Self::test_cnn_finance_source(client).await,
                 "MarketWatch" => Self::test_market_watch_source(client).await,
                 "NASDAQ" => Self::test_nasdaq_source(client).await,
                 "SeekingAlpha" => Self::test_seeking_alpha_source(client).await,
@@ -242,27 +240,6 @@ impl IntegrationTestRunner {
                 .await,
             );
         }
-
-        results
-    }
-
-    /// Test CNN Finance news source
-    async fn test_cnn_finance_source(client: reqwest::Client) -> Vec<TestResult> {
-        let cnn = CNNFinance::new(client);
-        let mut results = Vec::new();
-
-        results.push(Self::test_basic_functionality(&cnn, "CNNFinance").await);
-
-        results.extend(vec![
-            Self::test_function("all_stories", || cnn.all_stories()).await,
-            Self::test_function("companies", || cnn.companies()).await,
-            Self::test_function("economy", || cnn.economy()).await,
-            Self::test_function("international", || cnn.international()).await,
-            Self::test_function("markets", || cnn.markets()).await,
-            Self::test_function("media", || cnn.media()).await,
-            Self::test_function("personal_finance", || cnn.personal_finance()).await,
-            Self::test_function("technology", || cnn.technology()).await,
-        ]);
 
         results
     }

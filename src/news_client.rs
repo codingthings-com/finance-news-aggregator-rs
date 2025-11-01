@@ -18,7 +18,6 @@ pub struct NewsClient {
     nasdaq_client: Option<NASDAQ>,
     market_watch_client: Option<MarketWatch>,
     seeking_alpha_client: Option<SeekingAlpha>,
-    cnn_finance_client: Option<CNNFinance>,
     yahoo_finance_client: Option<YahooFinance>,
 }
 
@@ -47,7 +46,6 @@ impl NewsClient {
             nasdaq_client: None,
             market_watch_client: None,
             seeking_alpha_client: None,
-            cnn_finance_client: None,
             yahoo_finance_client: None,
         }
     }
@@ -190,28 +188,6 @@ impl NewsClient {
         self.seeking_alpha_client.as_ref().unwrap()
     }
 
-    /// Get CNN Finance client
-    ///
-    /// # Example
-    /// ```rust
-    /// use finance_news_aggregator_rs::NewsClient;
-    ///
-    /// #[tokio::main]
-    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    ///     let mut client = NewsClient::new();
-    ///     let cnn = client.cnn_finance();
-    ///     let stories = cnn.all_stories().await?;
-    ///     println!("Found {} articles", stories.len());
-    ///     Ok(())
-    /// }
-    /// ```
-    pub fn cnn_finance(&mut self) -> &CNNFinance {
-        if self.cnn_finance_client.is_none() {
-            self.cnn_finance_client = Some(CNNFinance::new(self.http_client.clone()));
-        }
-        self.cnn_finance_client.as_ref().unwrap()
-    }
-
     /// Get Yahoo Finance client
     ///
     /// # Example
@@ -288,7 +264,6 @@ mod tests {
         assert!(client.nasdaq_client.is_none());
         assert!(client.market_watch_client.is_none());
         assert!(client.seeking_alpha_client.is_none());
-        assert!(client.cnn_finance_client.is_none());
         assert!(client.yahoo_finance_client.is_none());
     }
 
@@ -335,13 +310,6 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_cnn_finance_client_access() {
-        let mut client = NewsClient::new();
-        let _cnn = client.cnn_finance();
-        assert!(client.cnn_finance_client.is_some());
-    }
-
-    #[tokio::test]
     async fn test_yahoo_finance_client_access() {
         let mut client = NewsClient::new();
         let _yahoo = client.yahoo_finance();
@@ -359,7 +327,6 @@ mod tests {
         let _nasdaq = client.nasdaq();
         let _mw = client.market_watch();
         let _sa = client.seeking_alpha();
-        let _cnn = client.cnn_finance();
         let _yahoo = client.yahoo_finance();
 
         // Verify all are initialized
@@ -369,7 +336,6 @@ mod tests {
         assert!(client.nasdaq_client.is_some());
         assert!(client.market_watch_client.is_some());
         assert!(client.seeking_alpha_client.is_some());
-        assert!(client.cnn_finance_client.is_some());
         assert!(client.yahoo_finance_client.is_some());
     }
 }

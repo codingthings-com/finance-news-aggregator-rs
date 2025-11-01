@@ -122,7 +122,7 @@ impl CliRunner {
         println!("OPTIONS:");
         println!("    -s, --sources <SOURCES>    Comma-separated list of sources to test");
         println!(
-            "                               (CNBC,CNNFinance,MarketWatch,NASDAQ,SeekingAlpha,WallStreetJournal,YahooFinance)"
+            "                               (CNBC,MarketWatch,NASDAQ,SeekingAlpha,WallStreetJournal,YahooFinance)"
         );
         println!("    -v, --verbose              Enable verbose output");
         println!("    -h, --help                 Print this help message");

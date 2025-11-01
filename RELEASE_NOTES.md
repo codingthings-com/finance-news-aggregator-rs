@@ -1,5 +1,24 @@
 # Release Notes
 
+## v0.2.2 - CNN Finance Removal
+
+### Breaking Changes
+
+- **Removed CNN Finance source**: All CNN Finance feeds were broken and have been completely removed
+  - Deleted `cnn_finance()` method from `NewsClient`
+  - Removed all CNN-related code, tests, and documentation
+  - Updated from 7 sources to 6 working sources
+
+### Current Status
+
+All 6 news sources at 100% success rate:
+- **CNBC**: 24 feeds ✅
+- **MarketWatch**: 4 feeds ✅
+- **NASDAQ**: 10 feeds ✅
+- **Seeking Alpha**: 12 feeds ✅
+- **Wall Street Journal**: 6 feeds ✅
+- **Yahoo Finance**: 2 feeds + symbol-based queries ✅
+
 ## v0.2.1 - Generic Source Support
 
 ### New Features
@@ -44,15 +63,11 @@ let articles = nasdaq.technology().await?;
 
 Removed broken RSS feeds for improved reliability:
 - **MarketWatch**: Removed 9 broken feeds → 4 working feeds (100% success rate)
-- **CNN Finance**: Removed 1 broken feed → 8 working feeds (100% success rate)
 
 **Removed MarketWatch feeds:**
 - `auto_reviews()`, `banking_and_finance()`, `commentary()`, `internet_stories()`
 - `software_stories()`, `newsletter_and_research()`, `stocks_to_watch()`
 - `personal_finance()`, `mutual_funds()`
-
-**Removed CNN Finance feeds:**
-- `real_estate()`
 
 ### Test Suite Improvements
 
@@ -68,17 +83,6 @@ Removed broken RSS feeds for improved reliability:
 - Updated API usage guide with working examples only
 - Removed outdated and verbose content
 - Added clear migration guide for breaking changes
-
-### Current Status
-
-All 7 news sources at 100% success rate:
-- **CNBC**: 24 feeds ✅
-- **CNN Finance**: 8 feeds ✅
-- **MarketWatch**: 4 feeds ✅
-- **NASDAQ**: 10 feeds ✅
-- **Seeking Alpha**: 12 feeds ✅
-- **Wall Street Journal**: 6 feeds ✅
-- **Yahoo Finance**: 2 feeds + symbol-based queries ✅
 
 ### Technical Improvements
 

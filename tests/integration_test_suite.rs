@@ -132,7 +132,6 @@ async fn test_network_connectivity() {
     // Test basic internet connectivity
     let test_urls = vec![
         "https://www.cnbc.com",
-        "https://money.cnn.com",
         "https://www.marketwatch.com",
         "https://www.nasdaq.com",
         "https://seekingalpha.com",

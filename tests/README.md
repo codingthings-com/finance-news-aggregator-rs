@@ -13,7 +13,6 @@ cargo test --tests
 ```bash
 cargo test --test test_nasdaq_integration
 cargo test --test test_cnbc_integration
-cargo test --test test_cnn_finance_integration
 cargo test --test test_wsj_integration
 cargo test --test test_yahoo_finance_integration
 cargo test --test test_seeking_alpha_integration
@@ -45,7 +44,6 @@ tests/
 ├── README.md                           # This file
 ├── test_nasdaq_integration.rs          # NASDAQ tests
 ├── test_cnbc_integration.rs            # CNBC tests
-├── test_cnn_finance_integration.rs     # CNN Finance tests
 ├── test_wsj_integration.rs             # Wall Street Journal tests
 ├── test_yahoo_finance_integration.rs   # Yahoo Finance tests
 ├── test_seeking_alpha_integration.rs   # Seeking Alpha tests

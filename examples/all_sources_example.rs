@@ -100,24 +100,6 @@ async fn main() -> Result<()> {
         Err(e) => eprintln!("Seeking Alpha Error: {}", e),
     }
 
-    // CNN Finance
-    println!("\n=== CNN Finance ===");
-    let cnn_finance = news_client.cnn_finance();
-    match cnn_finance.all_stories().await {
-        Ok(articles) => {
-            println!("CNN Finance All Stories: {} articles", articles.len());
-            for (i, article) in articles.iter().enumerate() {
-                println!(
-                    "  {}: {}. Link: {}",
-                    i + 1,
-                    article.title.as_deref().unwrap_or("No title"),
-                    article.link.as_deref().unwrap_or("No link")
-                );
-            }
-        }
-        Err(e) => eprintln!("CNN Finance Error: {}", e),
-    }
-
     // Yahoo Finance
     println!("\n=== Yahoo Finance ===");
     let yahoo_finance = news_client.yahoo_finance();

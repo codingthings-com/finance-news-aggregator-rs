@@ -9,7 +9,6 @@ A Rust library for aggregating financial news from various RSS feed sources. Por
 | Source | Working Feeds | Status |
 |--------|--------------|--------|
 | **CNBC** | 24 topics | ✅ 100% |
-| **CNN Finance** | 8 topics | ✅ 100% |
 | **MarketWatch** | 4 topics | ✅ 100% |
 | **NASDAQ** | 10 topics | ✅ 100% |
 | **Seeking Alpha** | 12 topics | ✅ 100% |
@@ -20,7 +19,7 @@ A Rust library for aggregating financial news from various RSS feed sources. Por
 
 ```toml
 [dependencies]
-finance-news-aggregator-rs = "0.2.1"
+finance-news-aggregator-rs = "0.2.2"
 ```
 
 ## Quick Start
@@ -154,6 +153,7 @@ cargo test --tests
 # Run specific source tests
 cargo test --test test_nasdaq_integration
 cargo test --test test_cnbc_integration
+cargo test --test test_wsj_integration
 ```
 
 ## Available Feeds
@@ -175,10 +175,6 @@ cargo test --test test_cnbc_integration
 ### Seeking Alpha (12 feeds)
 - `latest_articles()`, `all_news()`, `market_news()`, `editors_picks()`, `etfs()`, `forex()`
 - `ipo_analysis()`, `long_ideas()`, `short_ideas()`, `transcripts()`, `wall_street_breakfast()`, `most_popular_articles()`
-
-### CNN Finance (8 feeds)
-- `all_stories()`, `companies()`, `economy()`, `international()`, `markets()`
-- `media()`, `personal_finance()`, `technology()`
 
 ### Yahoo Finance (2 feeds + symbols)
 - `headlines()`, `topstories()`
@@ -248,7 +244,6 @@ src/
 └── news_source/        # Source implementations
     ├── mod.rs          # NewsSource trait
     ├── cnbc.rs
-    ├── cnn_finance.rs
     ├── market_watch.rs
     ├── nasdaq.rs
     ├── seeking_alpha.rs
