@@ -6,14 +6,14 @@ A Rust library for aggregating financial news from various RSS feed sources. Por
 
 ## Supported Sources
 
-| Source | Working Feeds | Status |
-|--------|--------------|--------|
-| **CNBC** | 24 topics | ✅ 100% |
-| **MarketWatch** | 4 topics | ✅ 100% |
-| **NASDAQ** | 10 topics | ✅ 100% |
-| **Seeking Alpha** | 12 topics | ✅ 100% |
-| **Wall Street Journal** | 6 topics | ✅ 100% |
-| **Yahoo Finance** | 2 topics + symbols | ✅ 100% |
+| Source | Working Feeds |
+|--------|--------------|
+| **CNBC** | 24 topics |
+| **MarketWatch** | 4 topics |
+| **NASDAQ** | 10 topics |
+| **Seeking Alpha** | 12 topics |
+| **Wall Street Journal** | 6 topics |
+| **Yahoo Finance** | 2 topics + symbols |
 
 ## Installation
 
